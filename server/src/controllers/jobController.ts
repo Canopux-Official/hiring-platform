@@ -4,6 +4,7 @@ import Job from "../models/Job";
 import Application from "../models/Application";
 import { AppError } from "../utils/AppError";
 import { successResponse, getPagination } from "../utils/helpers";
+import JobSeekerProfile from "../models/JobSeekerProfile";
 
 // ─── Create Job (Recruiter) ───────────────────────────────────────────────────
 export const createJob = async (
@@ -181,3 +182,96 @@ export const getMyJobs = async (
   }
 };
 
+
+
+
+// ─── Get Recommended Jobs (Job Seeker) ───────────────────────────────────────
+export const getRecommendedJobs = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { page, limit } = req.query as Record<string, string>;
+    const { skip, limit: take, page: currentPage } = getPagination(page, limit);
+
+    // Fetch the seeker's profile to get their skills
+    const profile = await JobSeekerProfile.findOne({
+      user: req.user!._id,
+    }).select("skills");
+
+    if (!profile || profile.skills.length === 0) {
+      res.status(200).json(
+        successResponse("Recommended jobs fetched", {
+          items: [],
+          total: 0,
+          page: currentPage,
+          limit: take,
+          totalPages: 0,
+        })
+      );
+      return;
+    }
+
+    const seekerSkills = profile.skills.map((s) => s.trim().toLowerCase());
+
+    // Count how many of the seeker's skills each job matches
+    const [jobs, total] = await Promise.all([
+      Job.aggregate([
+        {
+          $match: {
+            status: JobStatus.OPEN,
+            skills: { $in: seekerSkills },
+          },
+        },
+        {
+          $addFields: {
+            matchedSkills: {
+              $size: {
+                $ifNull: [
+                  {
+                    $filter: {
+                      input: "$skills",
+                      as: "skill",
+                      cond: { $in: ["$$skill", seekerSkills] },
+                    },
+                  },
+                  [],
+                ],
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            matchScore: {
+              $multiply: [
+                { $divide: ["$matchedSkills", { $size: "$skills" }] },
+                100,
+              ],
+            },
+          },
+        },
+        { $sort: { matchScore: -1, createdAt: -1 } },
+        { $skip: skip },
+        { $limit: take },
+      ]),
+      Job.countDocuments({
+        status: JobStatus.OPEN,
+        skills: { $in: seekerSkills },
+      }),
+    ]);
+
+    res.status(200).json(
+      successResponse("Recommended jobs fetched", {
+        items: jobs,
+        total,
+        page: currentPage,
+        limit: take,
+        totalPages: Math.ceil(total / take),
+      })
+    );
+  } catch (err) {
+    next(err);
+  }
+};

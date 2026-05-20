@@ -6,6 +6,7 @@ import {
   updateJob,
   deleteJob,
   getMyJobs,
+  getRecommendedJobs
 } from "../controllers/jobController";
 import {
   applyToJob,
@@ -24,13 +25,13 @@ const router = Router();
 router.get("/", getJobs);
 
 
-//Need to create this api.
-// router.get(
-//   "/recommended",
-//   authenticate,
-//   authorize(Role.JOB_SEEKER),
-//   getRecommendedJobs
-// );
+// Job Seeker.
+router.get(
+  "/recommended",
+  authenticate,
+  authorize(Role.JOB_SEEKER),
+  getRecommendedJobs
+);
 
 // Recruiter / Admin
 router.post(
@@ -78,4 +79,4 @@ router.post(
   applyToJob
 );
 
-export default router;
+export default router;   
