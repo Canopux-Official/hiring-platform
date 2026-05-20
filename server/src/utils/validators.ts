@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Role, ApplicationStatus, JobStatus } from "../types";
+import { flexDate } from "./helpers";
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 export const registerSchema = z.object({
@@ -64,17 +65,17 @@ export const updateProfileSchema = z.object({
   currentSalary: z.number().positive().optional(),
   noticePeriod: z.number().int().nonnegative().optional(),
   preferredLocations: z.array(z.string()).optional(),
-  linkedIn: z.string().url().optional(),
-  github: z.string().url().optional(),
-  portfolio: z.string().url().optional(),
+  linkedIn: z.string().url().optional().or(z.literal("")),
+  github: z.string().url().optional().or(z.literal("")),
+  portfolio: z.string().url().optional().or(z.literal("")),
   experience: z
     .array(
       z.object({
         title: z.string(),
         company: z.string(),
         location: z.string().optional(),
-        startDate: z.string().datetime(),
-        endDate: z.string().datetime().optional(),
+        startDate: flexDate,
+        endDate: flexDate.optional(),
         isCurrent: z.boolean().default(false),
         description: z.string().optional(),
       })

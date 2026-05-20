@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { Response } from "express";
 import { JwtPayload, ApiResponse, Role } from "../types";
 import { Types } from "mongoose";
+import z from "zod";
 
 // ─── JWT ──────────────────────────────────────────────────────────────────────
 export const generateToken = (
@@ -58,3 +59,16 @@ export const getPagination = (
     skip: (parsedPage - 1) * parsedLimit,
   };
 };
+
+export const flexDate = z
+  .string()
+  .regex(
+    /^\d{4}(-\d{2}(-\d{2}(T[\d:.]+Z?)?)?)?$/,
+    "Invalid date format. Expected YYYY, YYYY-MM, YYYY-MM-DD, or ISO 8601"
+  )
+  .transform((val) => {
+    // Pad partial dates so Mongoose/JS Date can parse them
+    if (/^\d{4}$/.test(val)) return `${val}-01-01T00:00:00.000Z`;
+    if (/^\d{4}-\d{2}$/.test(val)) return `${val}-01T00:00:00.000Z`;
+    return new Date(val).toISOString(); // full date or ISO — normalize
+  });

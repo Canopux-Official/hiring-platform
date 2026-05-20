@@ -25,18 +25,19 @@ app.use(
   })
 );
 
+const isDev = process.env.NODE_ENV === "development";
 
 // Rate Limiting.
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: isDev ? 99999 : 100,
   message: { success: false, message: "Too many requests, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
 });
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: isDev ? 99999 : 10,
   message: { success: false, message: "Too many login attempts. Please try again later." },
 });
 app.use("/api", limiter);

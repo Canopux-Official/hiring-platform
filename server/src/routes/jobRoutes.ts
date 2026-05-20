@@ -18,9 +18,19 @@ import { Role } from "../types";
 
 const router = Router();
 
+
+
 // Public
 router.get("/", getJobs);
-router.get("/:id", getJob);
+
+
+//Need to create this api.
+// router.get(
+//   "/recommended",
+//   authenticate,
+//   authorize(Role.JOB_SEEKER),
+//   getRecommendedJobs
+// );
 
 // Recruiter / Admin
 router.post(
@@ -36,6 +46,7 @@ router.get(
   authorize(Role.RECRUITER, Role.ADMIN),
   getMyJobs
 );
+router.get("/:id", getJob);
 router.patch(
   "/:id",
   authenticate,
