@@ -6,6 +6,7 @@ import { theme } from "./lib/theme";
 import { AuthProvider } from "./lib/auth";
 import { JobsProvider } from "./lib/jobs-store";
 import App from "./App";
+import { ToastProvider } from "./hooks/useToast";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <AuthProvider>
           <JobsProvider>
+            <ToastProvider>
             <App />
+            </ToastProvider>
           </JobsProvider>
         </AuthProvider>
       </BrowserRouter>
