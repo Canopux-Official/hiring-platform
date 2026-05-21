@@ -157,6 +157,7 @@ export async function updateMyProfile(
   return unwrap<IJobSeekerProfile>(res);
 }
  
+//what does this do? This UI needs to be created.
 export async function updateUserInfo(data: Partial<IUserInfo>): Promise<IUserInfo> {
   const res = await fetch(`${BASE_URL}/profile/me/user-info`, {
     method: "PATCH",
@@ -172,6 +173,7 @@ export async function getMyApplications(): Promise<IApplication[]> {
   const res = await fetch(`${BASE_URL}/applications/my`, { headers: authHeaders() });
   return unwrapPaginated<IApplication>(res);
 }
+//need to create GET	/applications/:id api
  
 export async function withdrawApplication(id: string): Promise<void> {
   const res = await fetch(`${BASE_URL}/applications/${id}/withdraw`, {
@@ -183,6 +185,7 @@ export async function withdrawApplication(id: string): Promise<void> {
     throw new Error(json?.message ?? "Failed to withdraw application");
   }
 }
+
  
 // ─── Recommended Jobs ─────────────────────────────────────────────────────────
 // GET /api/jobs/recommended — not yet implemented on backend.

@@ -228,6 +228,8 @@ export async function fetchApplicationsForJob(
   });
   return data.data;
 }
+
+//here also need to create GET	/applications/:id api
  
 export interface UpdateApplicationStatusPayload {
   status: ApplicationStatus;
@@ -242,6 +244,15 @@ export async function updateApplicationStatus(
     `${BASE}/applications/${applicationId}/status`,
     payload
   );
+  return data.data;
+}
+
+// ─── Single Application ───────────────────────────────────────────────────────
+ 
+export async function fetchApplicationById(
+  applicationId: string
+): Promise<IApplication> {
+  const { data } = await axios.get(`${BASE}/applications/${applicationId}`);
   return data.data;
 }
  
