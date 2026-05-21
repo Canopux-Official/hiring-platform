@@ -40,7 +40,9 @@ const applicationSchema = new Schema<IApplication>(
       type: String,
       maxlength: [3000, "Cover letter cannot exceed 3000 characters"],
     },
-    resumeUrl: String,
+    resumeUrl: {
+      type:  String
+    },
     status: {
       type: String,
       enum: Object.values(ApplicationStatus),
