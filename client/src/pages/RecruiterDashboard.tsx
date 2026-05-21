@@ -1,5 +1,4 @@
 // pages/RecruiterDashboard.tsx
-// Fully API-integrated recruiter dashboard with toast notifications.
 
 import { useState, useEffect, useCallback } from "react";
 import {
@@ -7,9 +6,11 @@ import {
   Avatar, LinearProgress, Menu, MenuItem, Drawer, Divider, Select,
   FormControl, CircularProgress, Pagination, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, Alert, Skeleton,
+  TextField,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import EditIcon from "@mui/icons-material/Edit";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import WorkIcon from "@mui/icons-material/Work";
@@ -23,13 +24,23 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import { alpha } from "@mui/material/styles";
 import { useAuth } from "../lib/auth";
-import NewJobModal from "../components/NewJobModal";
 import { useToast } from "../hooks/useToast";
+import NewJobModal from "../components/NewJobModal";
 import {
-  fetchMyJobs, fetchRecruiterStats, fetchApplicationsForJob,
-  fetchJobSeekerProfile, updateApplicationStatus, deleteJob as apiDeleteJob,
-  IJob, IApplication, IJobSeekerProfile, IRecruiterStats,
-  ApplicationStatus, Paginated,
+  fetchMyJobs,
+  fetchRecruiterStats,
+  fetchApplicationsForJob,
+  fetchJobSeekerProfile,
+  updateApplicationStatus,
+  updateJob,
+  deleteJob as apiDeleteJob,
+  IJob,
+  IApplication,
+  IJobSeekerProfile,
+  IRecruiterStats,
+  ApplicationStatus,
+  Paginated,
+  JobStatus,
 } from "../api/recruiter";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -37,8 +48,7 @@ import {
 function formatSalary(job: IJob) {
   if (!job.salaryRange) return "–";
   const { min, max, currency } = job.salaryRange;
-  const fmt = (n: number) =>
-    n >= 1000 ? `${(n / 1000).toFixed(0)}k` : String(n);
+  const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(0)}k` : String(n));
   return `${currency} ${fmt(min)}–${fmt(max)}`;
 }
 
@@ -48,14 +58,19 @@ function timeAgo(iso: string) {
   if (d === 0) return "Today";
   if (d === 1) return "Yesterday";
   if (d < 30) return `${d}d ago`;
-  const m = Math.floor(d / 30);
-  return `${m}mo ago`;
+  return `${Math.floor(d / 30)}mo ago`;
 }
 
 const JOB_TYPE_LABELS: Record<string, string> = {
   full_time: "Full-time", part_time: "Part-time", contract: "Contract",
   internship: "Internship", remote: "Remote",
 };
+
+const JOB_STATUS_OPTIONS: { value: JobStatus; label: string }[] = [
+  { value: "open",   label: "Open"   },
+  { value: "draft",  label: "Draft"  },
+  { value: "closed", label: "Closed" },
+];
 
 // ─── Skeletons ────────────────────────────────────────────────────────────────
 
@@ -82,7 +97,82 @@ function JobRowSkeleton() {
   );
 }
 
-// ─── Applicant Profile Drawer ─────────────────────────────────────────────────
+// ─── Slim Edit Modal ──────────────────────────────────────────────────────────
+// Only updates status + title — quick edits from the dashboard context menu.
+// Full re-posting is handled by NewJobModal (create flow).
+
+interface EditJobModalProps {
+  job: IJob | null;
+  onClose: () => void;
+  onSaved: (updated: IJob) => void;
+}
+
+function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
+  const toast = useToast();
+  const [title, setTitle] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (job) { setTitle(job.title); }
+  }, [job]);
+
+  async function handleSave() {
+    if (!job) return;
+    setSaving(true);
+    try {
+      const updated = await updateJob(job._id, { title });
+      toast.success(`"${updated.title}" updated`);
+      onSaved(updated);
+    } catch {
+      toast.error("Failed to update job. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Dialog
+      open={!!job}
+      onClose={onClose}
+      maxWidth="xs"
+      fullWidth
+      PaperProps={{ sx: { bgcolor: "background.paper", backgroundImage: "none" } }}
+    >
+      <DialogTitle>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Typography variant="h6">Edit job</Typography>
+          <IconButton onClick={onClose} disabled={saving}><CloseIcon /></IconButton>
+        </Stack>
+      </DialogTitle>
+      <Divider />
+      <DialogContent>
+        <Stack spacing={2} sx={{ pt: 1 }}>
+          <TextField
+            label="Job title"
+            fullWidth
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            disabled={saving}
+          />
+
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button onClick={onClose} disabled={saving}>Cancel</Button>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          disabled={saving || !title.trim()}
+          startIcon={saving ? <CircularProgress size={16} color="inherit" /> : null}
+        >
+          {saving ? "Saving…" : "Save"}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// ─── Profile Drawer ───────────────────────────────────────────────────────────
 
 interface ProfileDrawerProps {
   userId: string | null;
@@ -156,7 +246,7 @@ function ProfileDrawer({ userId, onClose }: ProfileDrawerProps) {
               <IconButton size="small" component="a" href={profile.portfolio} target="_blank"><LanguageIcon fontSize="small" /></IconButton>
             )}
             {profile.resumeUrl && (
-              <Button size="small" variant="outlined" startIcon={<OpenInNewIcon />} href={profile.resumeUrl} target="_blank" sx={{ ml: 0.5 }}>
+              <Button size="small" variant="outlined" startIcon={<OpenInNewIcon />} href={profile.resumeUrl} target="_blank">
                 Resume
               </Button>
             )}
@@ -208,8 +298,7 @@ function ProfileDrawer({ userId, onClose }: ProfileDrawerProps) {
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>{edu.degree} in {edu.fieldOfStudy}</Typography>
                     <Typography variant="caption" color="text.secondary">{edu.institution}</Typography>
                     <Typography variant="caption" color="text.disabled" display="block">
-                      {edu.startYear} – {edu.endYear ?? "Present"}
-                      {edu.grade ? ` · ${edu.grade}` : ""}
+                      {edu.startYear} – {edu.endYear ?? "Present"}{edu.grade ? ` · ${edu.grade}` : ""}
                     </Typography>
                   </Box>
                 ))}
@@ -258,18 +347,15 @@ function ApplicationsModal({ job, onClose, onViewProfile }: ApplicationsModalPro
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(
-    (p: number) => {
-      if (!job) return;
-      setLoading(true);
-      setError(null);
-      fetchApplicationsForJob(job._id, { page: p, limit: 10 })
-        .then((res) => { setData(res); setPage(p); })
-        .catch(() => setError("Failed to load applications."))
-        .finally(() => setLoading(false));
-    },
-    [job]
-  );
+  const load = useCallback((p: number) => {
+    if (!job) return;
+    setLoading(true);
+    setError(null);
+    fetchApplicationsForJob(job._id, { page: p, limit: 10 })
+      .then((res) => { setData(res); setPage(p); })
+      .catch(() => setError("Failed to load applications."))
+      .finally(() => setLoading(false));
+  }, [job]);
 
   useEffect(() => { if (job) load(1); }, [job, load]);
 
@@ -278,9 +364,7 @@ function ApplicationsModal({ job, onClose, onViewProfile }: ApplicationsModalPro
     try {
       const updated = await updateApplicationStatus(app._id, { status });
       setData((prev) =>
-        prev
-          ? { ...prev, items: prev.items.map((a) => (a._id === app._id ? updated : a)) }
-          : prev
+        prev ? { ...prev, items: prev.items.map((a) => (a._id === app._id ? updated : a)) } : prev
       );
       toast.success(`Application marked as "${status}"`);
     } catch {
@@ -337,7 +421,7 @@ function ApplicationsModal({ job, onClose, onViewProfile }: ApplicationsModalPro
         )}
 
         {!loading && (data?.items ?? []).map((app) => {
-          const applicant = typeof app.applicant === "object" ? app.applicant as IJobSeekerProfile : null;
+          const applicant = typeof app.applicant === "object" ? (app.applicant as IJobSeekerProfile) : null;
           const userId = applicant?._id ?? (typeof app.applicant === "string" ? app.applicant : null);
           const name = applicant?.user?.name ?? "Applicant";
           const headline = applicant?.headline ?? applicant?.user?.email ?? "";
@@ -370,9 +454,7 @@ function ApplicationsModal({ job, onClose, onViewProfile }: ApplicationsModalPro
                     disabled={updatingId === app._id}
                     onChange={(e) => handleStatusChange(app, e.target.value as ApplicationStatus)}
                     startAdornment={
-                      updatingId === app._id
-                        ? <CircularProgress size={14} sx={{ mr: 1 }} />
-                        : null
+                      updatingId === app._id ? <CircularProgress size={14} sx={{ mr: 1 }} /> : null
                     }
                   >
                     {Object.values(ApplicationStatus).map((s) => (
@@ -394,10 +476,7 @@ function ApplicationsModal({ job, onClose, onViewProfile }: ApplicationsModalPro
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{
-                    display: "block", mt: 1, pl: 7,
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                  }}
+                  sx={{ display: "block", mt: 1, pl: 7, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
                 >
                   "{app.coverLetter}"
                 </Typography>
@@ -409,12 +488,7 @@ function ApplicationsModal({ job, onClose, onViewProfile }: ApplicationsModalPro
 
       {data && data.totalPages > 1 && (
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-          <Pagination
-            count={data.totalPages}
-            page={page}
-            onChange={(_, p) => load(p)}
-            color="primary"
-          />
+          <Pagination count={data.totalPages} page={page} onChange={(_, p) => load(p)} color="primary" />
         </DialogActions>
       )}
     </Dialog>
@@ -438,8 +512,9 @@ export default function RecruiterDashboard() {
   const [jobsError, setJobsError] = useState<string | null>(null);
 
   // Modals / drawers
-  const [newJobOpen, setNewJobOpen] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<IJob | null>(null);
+  const [newJobOpen, setNewJobOpen] = useState(false);       // multi-step create modal
+  const [editingJob, setEditingJob] = useState<IJob | null>(null); // slim edit modal
+  const [selectedJob, setSelectedJob] = useState<IJob | null>(null); // applications modal
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [anchor, setAnchor] = useState<{ el: HTMLElement; job: IJob } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<IJob | null>(null);
@@ -478,7 +553,25 @@ export default function RecruiterDashboard() {
     loadJobs(1);
   }, [loadStats, loadJobs]);
 
-  // ── Delete ────────────────────────────────────────────────────────────────────
+  // ── Handlers ─────────────────────────────────────────────────────────────────
+
+  // Called by NewJobModal after successful createJob() API call
+  function handleJobCreated() {
+    setNewJobOpen(false);
+    toast.success("Job posted successfully!");
+    loadJobs(1);
+    loadStats();
+  }
+
+  // Called by EditJobModal after successful updateJob() API call
+  function handleJobUpdated(updated: IJob) {
+    setEditingJob(null);
+    // Patch row in-place — no full reload needed
+    setJobsData((prev) =>
+      prev ? { ...prev, items: prev.items.map((j) => (j._id === updated._id ? updated : j)) } : prev
+    );
+    loadStats();
+  }
 
   async function handleDelete() {
     if (!deleteConfirm) return;
@@ -487,7 +580,8 @@ export default function RecruiterDashboard() {
       await apiDeleteJob(deleteConfirm._id);
       toast.success(`"${deleteConfirm.title}" deleted`);
       setDeleteConfirm(null);
-      loadJobs(jobsPage);
+      const targetPage = jobsData?.items.length === 1 && jobsPage > 1 ? jobsPage - 1 : jobsPage;
+      loadJobs(targetPage);
       loadStats();
     } catch {
       toast.error("Failed to delete job. Please try again.");
@@ -496,16 +590,7 @@ export default function RecruiterDashboard() {
     }
   }
 
-  // ── New job created ───────────────────────────────────────────────────────────
-
-  function handleJobCreated() {
-    setNewJobOpen(false);
-    toast.success("Job posted successfully!");
-    loadJobs(1);
-    loadStats();
-  }
-
-  // ── Pipeline ──────────────────────────────────────────────────────────────────
+  // ── Derived pipeline data ─────────────────────────────────────────────────
 
   const pipeline = stats?.pipeline;
   const totalApps = stats?.totalApplications ?? 0;
@@ -513,30 +598,18 @@ export default function RecruiterDashboard() {
 
   const pipelineRows = pipeline
     ? [
-        { label: "Applications", value: totalApps, pct: 100, color: "primary.main" },
-        {
-          label: "Reviewed",
-          value: pipeline.reviewed + pipeline.shortlisted + pipeline.hired,
-          pct: pct(pipeline.reviewed + pipeline.shortlisted + pipeline.hired),
-          color: "secondary.main",
-        },
-        {
-          label: "Shortlisted",
-          value: pipeline.shortlisted + pipeline.hired,
-          pct: pct(pipeline.shortlisted + pipeline.hired),
-          color: "warning.main",
-        },
-        { label: "Hired", value: pipeline.hired, pct: pct(pipeline.hired), color: "success.main" },
+        { label: "Applications", value: totalApps, pct: 100 },
+        { label: "Reviewed",    value: pipeline.reviewed + pipeline.shortlisted + pipeline.hired, pct: pct(pipeline.reviewed + pipeline.shortlisted + pipeline.hired) },
+        { label: "Shortlisted", value: pipeline.shortlisted + pipeline.hired,                     pct: pct(pipeline.shortlisted + pipeline.hired) },
+        { label: "Hired",       value: pipeline.hired,                                            pct: pct(pipeline.hired) },
       ]
     : null;
 
-  // ── Stat cards ────────────────────────────────────────────────────────────────
-
   const statCards = [
-    { label: "Active jobs",         value: stats ? String(stats.totalJobs) : "–",               icon: <WorkIcon /> },
-    { label: "Total applications",  value: stats ? String(stats.totalApplications) : "–",        icon: <PeopleAltIcon /> },
-    { label: "Shortlisted",         value: stats ? String(stats.pipeline.shortlisted) : "–",     icon: <CheckCircleOutlineIcon /> },
-    { label: "Hired",               value: stats ? String(stats.pipeline.hired) : "–",           icon: <TrendingUpIcon /> },
+    { label: "Active jobs",        value: stats ? String(stats.totalJobs)              : "–", icon: <WorkIcon /> },
+    { label: "Total applications", value: stats ? String(stats.totalApplications)      : "–", icon: <PeopleAltIcon /> },
+    { label: "Shortlisted",        value: stats ? String(stats.pipeline.shortlisted)   : "–", icon: <CheckCircleOutlineIcon /> },
+    { label: "Hired",              value: stats ? String(stats.pipeline.hired)         : "–", icon: <TrendingUpIcon /> },
   ];
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -545,13 +618,7 @@ export default function RecruiterDashboard() {
     <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
 
       {/* Header */}
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        justifyContent="space-between"
-        alignItems={{ sm: "center" }}
-        spacing={2}
-        sx={{ mb: 4 }}
-      >
+      <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ sm: "center" }} spacing={2} sx={{ mb: 4 }}>
         <Box>
           <Typography variant="overline" color="primary.main">Recruiter workspace</Typography>
           <Typography variant="h3" sx={{ fontSize: { xs: 28, md: 36 } }}>
@@ -566,9 +633,7 @@ export default function RecruiterDashboard() {
       {/* Stat cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {statsLoading
-          ? [0, 1, 2, 3].map((i) => (
-              <Grid item xs={6} md={3} key={i}><StatCardSkeleton /></Grid>
-            ))
+          ? [0, 1, 2, 3].map((i) => <Grid item xs={6} md={3} key={i}><StatCardSkeleton /></Grid>)
           : statCards.map((s) => (
               <Grid item xs={6} md={3} key={s.label}>
                 <Card sx={{ p: 3 }}>
@@ -589,9 +654,7 @@ export default function RecruiterDashboard() {
           <Card sx={{ p: 3 }}>
             <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
               <Typography variant="h6">Your Jobs</Typography>
-              {jobsData && (
-                <Typography variant="body2" color="text.secondary">{jobsData.total} total</Typography>
-              )}
+              {jobsData && <Typography variant="body2" color="text.secondary">{jobsData.total} total</Typography>}
             </Stack>
 
             {jobsError && <Alert severity="error" sx={{ mb: 2 }}>{jobsError}</Alert>}
@@ -622,8 +685,8 @@ export default function RecruiterDashboard() {
                             label={job.status}
                             sx={{
                               textTransform: "capitalize",
-                              bgcolor: job.status === "active" ? alpha("#34d39e", 0.15) : alpha("#ffffff", 0.08),
-                              color: job.status === "active" ? "primary.main" : "text.secondary",
+                              bgcolor: job.status === "open" ? alpha("#34d39e", 0.15) : alpha("#ffffff", 0.08),
+                              color: job.status === "open" ? "primary.main" : "text.secondary",
                               fontWeight: 600,
                             }}
                           />
@@ -634,12 +697,8 @@ export default function RecruiterDashboard() {
                       </Box>
 
                       <Box sx={{ display: { xs: "none", md: "block" }, textAlign: "right", minWidth: 100 }}>
-                        <Typography variant="body2" sx={{ color: "primary.main", fontWeight: 600 }}>
-                          {formatSalary(job)}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {JOB_TYPE_LABELS[job.type] ?? job.type}
-                        </Typography>
+                        <Typography variant="body2" sx={{ color: "primary.main", fontWeight: 600 }}>{formatSalary(job)}</Typography>
+                        <Typography variant="caption" color="text.secondary">{JOB_TYPE_LABELS[job.type] ?? job.type}</Typography>
                       </Box>
 
                       <Tooltip title="View applications">
@@ -651,9 +710,7 @@ export default function RecruiterDashboard() {
                             "&:hover": { color: "primary.main" },
                           }}
                         >
-                          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>
-                            {job.applicationsCount}
-                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>{job.applicationsCount}</Typography>
                           <Typography variant="caption" color="text.secondary">apps</Typography>
                         </Box>
                       </Tooltip>
@@ -675,12 +732,7 @@ export default function RecruiterDashboard() {
 
             {jobsData && jobsData.totalPages > 1 && (
               <Stack alignItems="center" sx={{ mt: 2 }}>
-                <Pagination
-                  count={jobsData.totalPages}
-                  page={jobsPage}
-                  onChange={(_, p) => loadJobs(p)}
-                  color="primary"
-                />
+                <Pagination count={jobsData.totalPages} page={jobsPage} onChange={(_, p) => loadJobs(p)} color="primary" />
               </Stack>
             )}
           </Card>
@@ -694,8 +746,7 @@ export default function RecruiterDashboard() {
               ? [1, 2, 3, 4].map((i) => (
                   <Box key={i} sx={{ mb: 2 }}>
                     <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
-                      <Skeleton variant="text" width="40%" />
-                      <Skeleton variant="text" width="20%" />
+                      <Skeleton variant="text" width="40%" /><Skeleton variant="text" width="20%" />
                     </Stack>
                     <Skeleton variant="rounded" height={6} />
                   </Box>
@@ -713,9 +764,7 @@ export default function RecruiterDashboard() {
                     <LinearProgress variant="determinate" value={p.pct} sx={{ height: 6, borderRadius: 3 }} />
                   </Box>
                 ))
-              : (
-                <Typography variant="body2" color="text.secondary">Pipeline data unavailable.</Typography>
-              )}
+              : <Typography variant="body2" color="text.secondary">Pipeline data unavailable.</Typography>}
           </Card>
 
           <Card sx={{ p: 3 }}>
@@ -748,6 +797,9 @@ export default function RecruiterDashboard() {
         <MenuItem onClick={() => { if (anchor) setSelectedJob(anchor.job); setAnchor(null); }}>
           View applications
         </MenuItem>
+        <MenuItem onClick={() => { if (anchor) { setEditingJob(anchor.job); setAnchor(null); } }}>
+          <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
+        </MenuItem>
         <Divider />
         <MenuItem
           onClick={() => { if (anchor) setDeleteConfirm(anchor.job); setAnchor(null); }}
@@ -758,7 +810,7 @@ export default function RecruiterDashboard() {
       </Menu>
 
       {/* Delete confirmation */}
-      <Dialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)}>
+      <Dialog open={!!deleteConfirm} onClose={() => !deleteLoading && setDeleteConfirm(null)}>
         <DialogTitle>Delete job?</DialogTitle>
         <DialogContent>
           <Typography>
@@ -766,7 +818,7 @@ export default function RecruiterDashboard() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteConfirm(null)}>Cancel</Button>
+          <Button onClick={() => setDeleteConfirm(null)} disabled={deleteLoading}>Cancel</Button>
           <Button
             color="error"
             variant="contained"
@@ -779,18 +831,29 @@ export default function RecruiterDashboard() {
         </DialogActions>
       </Dialog>
 
-      {/* Applications modal */}
+      {/* Create — original multi-step UI, calls createJob() */}
+      <NewJobModal
+        open={newJobOpen}
+        onClose={() => setNewJobOpen(false)}
+        onSuccess={handleJobCreated}
+      />
+
+      {/* Edit — slim modal, calls updateJob() */}
+      <EditJobModal
+        job={editingJob}
+        onClose={() => setEditingJob(null)}
+        onSaved={handleJobUpdated}
+      />
+
+      {/* Applications modal — calls fetchApplicationsForJob + updateApplicationStatus */}
       <ApplicationsModal
         job={selectedJob}
         onClose={() => setSelectedJob(null)}
         onViewProfile={(id) => { setSelectedJob(null); setProfileUserId(id); }}
       />
 
-      {/* Profile drawer */}
+      {/* Profile drawer — calls fetchJobSeekerProfile */}
       <ProfileDrawer userId={profileUserId} onClose={() => setProfileUserId(null)} />
-
-      {/* New job modal */}
-      <NewJobModal open={newJobOpen} onClose={handleJobCreated} />
     </Container>
   );
 }

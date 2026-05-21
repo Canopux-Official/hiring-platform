@@ -16,7 +16,7 @@ export type ExperienceLevel =
   | "lead"
   | "executive";
  
-export type JobStatus = "draft" | "active" | "paused" | "closed";
+export type JobStatus = "open" | "draft" | "closed";
  
 export enum ApplicationStatus {
   PENDING = "pending",
@@ -194,7 +194,6 @@ export interface CreateJobPayload {
 }
  
 export async function createJob(payload: CreateJobPayload): Promise<IJob> {
-    console.log("Creating job with payload:", payload);
   const { data } = await axios.post(`${BASE}/jobs`, payload);
   return data.data;
 }

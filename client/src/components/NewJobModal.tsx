@@ -2,34 +2,78 @@ import { useState } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Stack,
   Stepper, Step, StepLabel, Box, Typography, MenuItem, Chip, IconButton, Grid,
-  Card, LinearProgress, Divider,
+  Card, LinearProgress, Divider, CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { alpha } from "@mui/material/styles";
-import { useJobs, Job, EmploymentType, WorkMode, Urgency } from "../lib/jobs-store";
+import { createJob, CreateJobPayload, JobType, ExperienceLevel } from "../api/recruiter";
+import { useToast } from "../hooks/useToast";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const steps = ["Basics", "Details", "Requirements", "Review"];
 
-interface Props { open: boolean; onClose: () => void; }
+// Map display labels → API enum values
+const EMPLOYMENT_TYPE_MAP: Record<string, JobType> = {
+  "Full-time":  "full_time",
+  "Part-time":  "part_time",
+  "Contract":   "contract",
+  "Internship": "internship",
+  "Freelance":  "full_time",  // no freelance in API; closest fallback
+  "Remote":     "remote",
+};
+
+// Map experience string → API ExperienceLevel
+function inferExperienceLevel(exp: string): ExperienceLevel {
+  const s = exp.toLowerCase();
+  if (s.includes("lead") || s.includes("staff") || s.includes("principal")) return "lead";
+  if (s.includes("executive") || s.includes("vp") || s.includes("director") || s.includes("c-level")) return "executive";
+  if (s.includes("senior") || s.includes("sr") || s.includes("5+") || s.includes("7+") || s.includes("8+") || s.includes("10+")) return "senior";
+  if (s.includes("junior") || s.includes("jr") || s.includes("entry") || s.includes("0") || s.includes("1 year") || s.includes("fresher")) return "entry";
+  return "mid"; // default
+}
+
+// Split a textarea string into a clean string[]
+function toLines(val: string): string[] {
+  return val.split("\n").map((l) => l.replace(/^[•\-\*]\s*/, "").trim()).filter(Boolean);
+}
+
+// ─── Form shape (matches original UI exactly) ─────────────────────────────────
+
+type Urgency = "Standard" | "High" | "Urgent";
+type WorkMode = "Remote" | "Hybrid" | "On-site";
+type EmploymentType = "Full-time" | "Part-time" | "Contract" | "Internship" | "Freelance" | "Remote";
 
 const empty = {
-  title: "", company: "", logo: "?", category: "Engineering",
-  employmentType: "Full-time" as EmploymentType, workMode: "Remote" as WorkMode,
-  location: "", currency: "USD", salaryMin: 80000, salaryMax: 140000,
+  title: "", company: "", category: "Engineering",
+  employmentType: "Full-time" as EmploymentType,
+  workMode: "Remote" as WorkMode,
+  location: "", currency: "INR", salaryMin: 500000, salaryMax: 1200000,
   experience: "3+ years", skills: [] as string[],
   description: "", responsibilities: "", requirements: "", benefits: "",
   openings: 1, deadline: "", urgency: "Standard" as Urgency,
 };
 
-export default function NewJobModal({ open, onClose }: Props) {
+// ─── Props ────────────────────────────────────────────────────────────────────
+
+interface Props {
+  open: boolean;
+  onClose: () => void;      // called on cancel / X — no refresh
+  onSuccess: () => void;    // called after successful publish — triggers dashboard refresh + toast
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function NewJobModal({ open, onClose, onSuccess }: Props) {
+  const toast = useToast();
+
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(empty);
   const [skillInput, setSkillInput] = useState("");
   const [generating, setGenerating] = useState(false);
-  const { addJob } = useJobs();
+  const [submitting, setSubmitting] = useState(false);
 
   const update = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -40,6 +84,7 @@ export default function NewJobModal({ open, onClose }: Props) {
     setSkillInput("");
   };
 
+  // AI Assist — unchanged from original (local mock)
   const aiGenerate = () => {
     setGenerating(true);
     setTimeout(() => {
@@ -51,33 +96,74 @@ export default function NewJobModal({ open, onClose }: Props) {
     }, 900);
   };
 
-  const submit = () => {
-    const job: Job = {
-      ...form,
-      id: `job-${Date.now()}`,
-      logo: form.company ? form.company[0].toUpperCase() : "?",
-      screening: [],
-      postedAt: Date.now(),
-      match: 85,
-      status: "published",
-      isUserPosted: true,
-    };
-    addJob(job);
-    onClose();
+  // Reset form when modal closes
+  function handleClose() {
+    if (submitting) return; // don't allow closing mid-submit
     setForm(empty);
     setStep(0);
-  };
+    setSkillInput("");
+    onClose();
+  }
+
+  // ── Submit → createJob API ─────────────────────────────────────────────────
+
+  async function submit() {
+    setSubmitting(true);
+    try {
+      const payload: CreateJobPayload = {
+        title:            form.title,
+        company:          form.company,
+        location:         form.location,
+        description:      form.description,
+        responsibilities: toLines(form.responsibilities),
+        requirements:     toLines(form.requirements),
+        skills:           form.skills,
+        type:             EMPLOYMENT_TYPE_MAP[form.employmentType] ?? "full_time",
+        experienceLevel:  inferExperienceLevel(form.experience),
+        openings:         form.openings,
+        status:           "open",
+        salaryRange: {
+          min:      form.salaryMin,
+          max:      form.salaryMax,
+          currency: form.currency,
+        },
+        ...(form.deadline ? { applicationDeadline: new Date(form.deadline).toISOString() } : {}),
+      };
+
+      await createJob(payload);
+
+      // Reset internal state
+      setForm(empty);
+      setStep(0);
+      setSkillInput("");
+
+      // Notify dashboard — it will show the toast and reload jobs
+      onSuccess();
+    } catch {
+      toast.error("Failed to post job. Please check your details and try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   const progress = Math.round(((step + 1) / steps.length) * 100);
 
+  // ─────────────────────────────────────────────────────────────────────────────
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth PaperProps={{ sx: { bgcolor: "background.paper", borderRadius: 3 } }}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="lg"
+      fullWidth
+      PaperProps={{ sx: { bgcolor: "background.paper", borderRadius: 3 } }}
+    >
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pr: 1 }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700 }}>Post a new job</Typography>
           <Typography variant="body2" color="text.secondary">Step {step + 1} of {steps.length}</Typography>
         </Box>
-        <IconButton onClick={onClose}><CloseIcon /></IconButton>
+        <IconButton onClick={handleClose} disabled={submitting}><CloseIcon /></IconButton>
       </DialogTitle>
       <LinearProgress variant="determinate" value={progress} sx={{ height: 3 }} />
 
@@ -88,54 +174,107 @@ export default function NewJobModal({ open, onClose }: Props) {
 
         <Grid container spacing={4}>
           <Grid item xs={12} md={7}>
+
+            {/* ── Step 0: Basics ─────────────────────────────────────────── */}
             {step === 0 && (
               <Stack spacing={2}>
                 <TextField label="Job title" value={form.title} onChange={(e) => update("title", e.target.value)} fullWidth />
                 <TextField label="Company" value={form.company} onChange={(e) => update("company", e.target.value)} fullWidth />
                 <Grid container spacing={2}>
-                  <Grid item xs={6}><TextField select label="Category" value={form.category} onChange={(e) => update("category", e.target.value)} fullWidth>
-                    {["Engineering", "Design", "Creative", "Hospitality", "Logistics", "Executive", "Other"].map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
-                  </TextField></Grid>
-                  <Grid item xs={6}><TextField select label="Type" value={form.employmentType} onChange={(e) => update("employmentType", e.target.value as EmploymentType)} fullWidth>
-                    {["Full-time", "Part-time", "Contract", "Internship", "Freelance", "Remote"].map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
-                  </TextField></Grid>
-                  <Grid item xs={6}><TextField select label="Work mode" value={form.workMode} onChange={(e) => update("workMode", e.target.value as WorkMode)} fullWidth>
-                    {["Remote", "Hybrid", "On-site"].map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
-                  </TextField></Grid>
-                  <Grid item xs={6}><TextField label="Location" value={form.location} onChange={(e) => update("location", e.target.value)} fullWidth /></Grid>
+                  <Grid item xs={6}>
+                    <TextField select label="Category" value={form.category} onChange={(e) => update("category", e.target.value)} fullWidth>
+                      {["Engineering", "Design", "Creative", "Hospitality", "Logistics", "Executive", "Other"].map((c) => (
+                        <MenuItem key={c} value={c}>{c}</MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField select label="Type" value={form.employmentType} onChange={(e) => update("employmentType", e.target.value as EmploymentType)} fullWidth>
+                      {["Full-time", "Part-time", "Contract", "Internship", "Freelance", "Remote"].map((c) => (
+                        <MenuItem key={c} value={c}>{c}</MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField select label="Work mode" value={form.workMode} onChange={(e) => update("workMode", e.target.value as WorkMode)} fullWidth>
+                      {["Remote", "Hybrid", "On-site"].map((c) => (
+                        <MenuItem key={c} value={c}>{c}</MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField label="Location" value={form.location} onChange={(e) => update("location", e.target.value)} fullWidth />
+                  </Grid>
                 </Grid>
               </Stack>
             )}
 
+            {/* ── Step 1: Details ────────────────────────────────────────── */}
             {step === 1 && (
               <Stack spacing={2}>
                 <Grid container spacing={2}>
-                  <Grid item xs={4}><TextField select label="Currency" value={form.currency} onChange={(e) => update("currency", e.target.value)} fullWidth>
-                    {["USD", "EUR", "GBP", "INR", "AED", "CAD", "AUD", "SGD"].map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
-                  </TextField></Grid>
-                  <Grid item xs={4}><TextField type="number" label="Min salary" value={form.salaryMin} onChange={(e) => update("salaryMin", +e.target.value)} fullWidth /></Grid>
-                  <Grid item xs={4}><TextField type="number" label="Max salary" value={form.salaryMax} onChange={(e) => update("salaryMax", +e.target.value)} fullWidth /></Grid>
+                  <Grid item xs={4}>
+                    <TextField select label="Currency" value={form.currency} onChange={(e) => update("currency", e.target.value)} fullWidth>
+                      {["USD", "EUR", "GBP", "INR", "AED", "CAD", "AUD", "SGD"].map((c) => (
+                        <MenuItem key={c} value={c}>{c}</MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField type="number" label="Min salary" value={form.salaryMin} onChange={(e) => update("salaryMin", +e.target.value)} fullWidth />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField type="number" label="Max salary" value={form.salaryMax} onChange={(e) => update("salaryMax", +e.target.value)} fullWidth />
+                  </Grid>
                 </Grid>
                 <TextField label="Experience" value={form.experience} onChange={(e) => update("experience", e.target.value)} fullWidth />
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2" color="text.secondary">Description ({form.description.length} chars)</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Description ({form.description.length} chars)
+                  </Typography>
                   <Button size="small" startIcon={<AutoAwesomeIcon />} onClick={aiGenerate} disabled={generating}>
                     {generating ? "Generating…" : "AI Assist"}
                   </Button>
                 </Stack>
-                <TextField label="Description" multiline rows={4} value={form.description} onChange={(e) => update("description", e.target.value)} fullWidth />
+                <TextField
+                  label="Description"
+                  multiline
+                  rows={4}
+                  value={form.description}
+                  onChange={(e) => update("description", e.target.value)}
+                  fullWidth
+                  error={form.description.length > 0 && form.description.length < 50}
+                  helperText={
+                    form.description.length > 0 && form.description.length < 50
+                      ? `${50 - form.description.length} more characters required`
+                      : undefined
+                  }
+                />
                 <TextField label="Responsibilities" multiline rows={3} value={form.responsibilities} onChange={(e) => update("responsibilities", e.target.value)} fullWidth />
               </Stack>
             )}
 
+            {/* ── Step 2: Requirements ───────────────────────────────────── */}
             {step === 2 && (
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="body2" sx={{ mb: 1 }}>Skills</Typography>
                   <Stack direction="row" spacing={1}>
-                    <TextField size="small" placeholder="Add a skill…" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSkill(); } }} fullWidth />
+                    <TextField
+                      size="small"
+                      placeholder="Add a skill…"
+                      value={skillInput}
+                      onChange={(e) => setSkillInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSkill(); } }}
+                      fullWidth
+                    />
                     <IconButton onClick={addSkill} color="primary"><AddIcon /></IconButton>
                   </Stack>
+                  {form.skills.length === 0 && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
+                      At least one skill is required
+                    </Typography>
+                  )}
                   <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
                     {form.skills.map((s) => (
                       <Chip key={s} label={s} onDelete={() => update("skills", form.skills.filter((x) => x !== s))} />
@@ -145,15 +284,24 @@ export default function NewJobModal({ open, onClose }: Props) {
                 <TextField label="Requirements" multiline rows={4} value={form.requirements} onChange={(e) => update("requirements", e.target.value)} fullWidth />
                 <TextField label="Benefits" multiline rows={3} value={form.benefits} onChange={(e) => update("benefits", e.target.value)} fullWidth />
                 <Grid container spacing={2}>
-                  <Grid item xs={4}><TextField type="number" label="Openings" value={form.openings} onChange={(e) => update("openings", +e.target.value)} fullWidth /></Grid>
-                  <Grid item xs={4}><TextField type="date" label="Deadline" InputLabelProps={{ shrink: true }} value={form.deadline} onChange={(e) => update("deadline", e.target.value)} fullWidth /></Grid>
-                  <Grid item xs={4}><TextField select label="Urgency" value={form.urgency} onChange={(e) => update("urgency", e.target.value as Urgency)} fullWidth>
-                    {["Standard", "High", "Urgent"].map((u) => <MenuItem key={u} value={u}>{u}</MenuItem>)}
-                  </TextField></Grid>
+                  <Grid item xs={4}>
+                    <TextField type="number" label="Openings" value={form.openings} onChange={(e) => update("openings", +e.target.value)} fullWidth />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField type="date" label="Deadline" InputLabelProps={{ shrink: true }} value={form.deadline} onChange={(e) => update("deadline", e.target.value)} fullWidth />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField select label="Urgency" value={form.urgency} onChange={(e) => update("urgency", e.target.value as Urgency)} fullWidth>
+                      {["Standard", "High", "Urgent"].map((u) => (
+                        <MenuItem key={u} value={u}>{u}</MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
                 </Grid>
               </Stack>
             )}
 
+            {/* ── Step 3: Review ─────────────────────────────────────────── */}
             {step === 3 && (
               <Stack spacing={1}>
                 <Typography variant="h6">{form.title || "Untitled role"}</Typography>
@@ -168,12 +316,14 @@ export default function NewJobModal({ open, onClose }: Props) {
             )}
           </Grid>
 
-          {/* Live preview */}
+          {/* ── Live preview (unchanged) ──────────────────────────────────── */}
           <Grid item xs={12} md={5}>
             <Card sx={{ p: 3, position: "sticky", top: 0 }}>
               <Typography variant="overline" color="primary.main">Live preview</Typography>
               <Typography variant="h6" sx={{ mt: 1 }}>{form.title || "Job title"}</Typography>
-              <Typography color="text.secondary" variant="body2">{form.company || "Company"} · {form.location || "Location"}</Typography>
+              <Typography color="text.secondary" variant="body2">
+                {form.company || "Company"} · {form.location || "Location"}
+              </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
                 <Chip size="small" label={form.employmentType} variant="outlined" />
                 <Chip size="small" label={form.workMode} variant="outlined" />
@@ -193,15 +343,32 @@ export default function NewJobModal({ open, onClose }: Props) {
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3 }}>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleClose} disabled={submitting}>Cancel</Button>
         <Box sx={{ flex: 1 }} />
-        {step > 0 && <Button onClick={() => setStep(step - 1)}>Back</Button>}
+        {step > 0 && (
+          <Button onClick={() => setStep(step - 1)} disabled={submitting}>Back</Button>
+        )}
         {step < steps.length - 1 ? (
-          <Button variant="contained" onClick={() => setStep(step + 1)} disabled={step === 0 && (!form.title || !form.company)}>
+          <Button
+            variant="contained"
+            onClick={() => setStep(step + 1)}
+            disabled={
+              (step === 0 && (!form.title || !form.company || !form.location)) ||
+              (step === 1 && form.description.length < 50) ||
+              (step === 2 && form.skills.length === 0)
+            }
+          >
             Continue
           </Button>
         ) : (
-          <Button variant="contained" onClick={submit}>Publish job</Button>
+          <Button
+            variant="contained"
+            onClick={submit}
+            disabled={submitting}
+            startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : null}
+          >
+            {submitting ? "Publishing…" : "Publish job"}
+          </Button>
         )}
       </DialogActions>
     </Dialog>
