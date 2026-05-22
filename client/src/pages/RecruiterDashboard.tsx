@@ -70,8 +70,8 @@ const JOB_TYPE_LABELS: Record<string, string> = {
 };
 
 const JOB_STATUS_OPTIONS: { value: JobStatus; label: string }[] = [
-  { value: "open",   label: "Open"   },
-  { value: "draft",  label: "Draft"  },
+  { value: "open", label: "Open" },
+  { value: "draft", label: "Draft" },
   { value: "closed", label: "Closed" },
 ];
 
@@ -367,11 +367,11 @@ function ApplicationDetailDrawer({ applicationId, onClose, onViewProfile }: Appl
   const name = applicant?.user?.name ?? "Applicant";
 
   const STATUS_COLOR: Record<string, "default" | "warning" | "info" | "error" | "success"> = {
-    pending:     "default",
-    reviewed:    "warning",
+    pending: "default",
+    reviewed: "warning",
     shortlisted: "info",
-    rejected:    "error",
-    hired:       "success",
+    rejected: "error",
+    hired: "success",
   };
 
   return (
@@ -551,9 +551,10 @@ interface ApplicationsModalProps {
   job: IJob | null;
   onClose: () => void;
   onViewProfile: (userId: string) => void;
+  onViewApplication: (appId: string) => void; // ← add this
 }
 
-function ApplicationsModal({ job, onClose, onViewProfile }: ApplicationsModalProps) {
+function ApplicationsModal({ job, onClose, onViewProfile, onViewApplication }: ApplicationsModalProps) {
   const toast = useToast();
   const [data, setData] = useState<Paginated<IApplication> | null>(null);
   const [page, setPage] = useState(1);
@@ -686,7 +687,7 @@ function ApplicationsModal({ job, onClose, onViewProfile }: ApplicationsModalPro
                   </Tooltip>
                 )}
                 <Tooltip title="View application">
-                  <IconButton size="small" onClick={() => setDetailAppId(app._id)}>
+                  <IconButton size="small" onClick={() => onViewApplication(app._id)}>
                     <ArticleIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -712,12 +713,6 @@ function ApplicationsModal({ job, onClose, onViewProfile }: ApplicationsModalPro
         </DialogActions>
       )}
 
-      {/* Application detail drawer — calls GET /applications/:id */}
-      <ApplicationDetailDrawer
-        applicationId={detailAppId}
-        onClose={() => setDetailAppId(null)}
-        onViewProfile={(id) => { setDetailAppId(null); onClose(); onViewProfile(id); }}
-      />
     </Dialog>
   );
 }
@@ -746,6 +741,7 @@ export default function RecruiterDashboard() {
   const [anchor, setAnchor] = useState<{ el: HTMLElement; job: IJob } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<IJob | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [detailAppId, setDetailAppId] = useState<string | null>(null);
 
   // ── Loaders ──────────────────────────────────────────────────────────────────
 
@@ -825,18 +821,18 @@ export default function RecruiterDashboard() {
 
   const pipelineRows = pipeline
     ? [
-        { label: "Applications", value: totalApps, pct: 100 },
-        { label: "Reviewed",    value: pipeline.reviewed + pipeline.shortlisted + pipeline.hired, pct: pct(pipeline.reviewed + pipeline.shortlisted + pipeline.hired) },
-        { label: "Shortlisted", value: pipeline.shortlisted + pipeline.hired,                     pct: pct(pipeline.shortlisted + pipeline.hired) },
-        { label: "Hired",       value: pipeline.hired,                                            pct: pct(pipeline.hired) },
-      ]
+      { label: "Applications", value: totalApps, pct: 100 },
+      { label: "Reviewed", value: pipeline.reviewed + pipeline.shortlisted + pipeline.hired, pct: pct(pipeline.reviewed + pipeline.shortlisted + pipeline.hired) },
+      { label: "Shortlisted", value: pipeline.shortlisted + pipeline.hired, pct: pct(pipeline.shortlisted + pipeline.hired) },
+      { label: "Hired", value: pipeline.hired, pct: pct(pipeline.hired) },
+    ]
     : null;
 
   const statCards = [
-    { label: "Active jobs",        value: stats ? String(stats.totalJobs)              : "–", icon: <WorkIcon /> },
-    { label: "Total applications", value: stats ? String(stats.totalApplications)      : "–", icon: <PeopleAltIcon /> },
-    { label: "Shortlisted",        value: stats ? String(stats.pipeline.shortlisted)   : "–", icon: <CheckCircleOutlineIcon /> },
-    { label: "Hired",              value: stats ? String(stats.pipeline.hired)         : "–", icon: <TrendingUpIcon /> },
+    { label: "Active jobs", value: stats ? String(stats.totalJobs) : "–", icon: <WorkIcon /> },
+    { label: "Total applications", value: stats ? String(stats.totalApplications) : "–", icon: <PeopleAltIcon /> },
+    { label: "Shortlisted", value: stats ? String(stats.pipeline.shortlisted) : "–", icon: <CheckCircleOutlineIcon /> },
+    { label: "Hired", value: stats ? String(stats.pipeline.hired) : "–", icon: <TrendingUpIcon /> },
   ];
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -862,16 +858,16 @@ export default function RecruiterDashboard() {
         {statsLoading
           ? [0, 1, 2, 3].map((i) => <Grid item xs={6} md={3} key={i}><StatCardSkeleton /></Grid>)
           : statCards.map((s) => (
-              <Grid item xs={6} md={3} key={s.label}>
-                <Card sx={{ p: 3 }}>
-                  <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: alpha("#34d39e", 0.12), color: "primary.main", width: "fit-content", mb: 1.5 }}>
-                    {s.icon}
-                  </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 800 }}>{s.value}</Typography>
-                  <Typography variant="body2" color="text.secondary">{s.label}</Typography>
-                </Card>
-              </Grid>
-            ))}
+            <Grid item xs={6} md={3} key={s.label}>
+              <Card sx={{ p: 3 }}>
+                <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: alpha("#34d39e", 0.12), color: "primary.main", width: "fit-content", mb: 1.5 }}>
+                  {s.icon}
+                </Box>
+                <Typography variant="h4" sx={{ fontWeight: 800 }}>{s.value}</Typography>
+                <Typography variant="body2" color="text.secondary">{s.label}</Typography>
+              </Card>
+            </Grid>
+          ))}
       </Grid>
 
       <Grid container spacing={3}>
@@ -890,63 +886,63 @@ export default function RecruiterDashboard() {
               {jobsLoading
                 ? [1, 2, 3, 4].map((i) => <JobRowSkeleton key={i} />)
                 : (jobsData?.items ?? []).map((job) => (
-                    <Box
-                      key={job._id}
-                      sx={{
-                        p: 2, borderRadius: 2,
-                        border: `1px solid ${alpha("#ffffff", 0.06)}`,
-                        display: "flex", alignItems: "center", gap: 2,
-                        "&:hover": { borderColor: alpha("#34d39e", 0.4) },
-                        transition: "border-color .15s",
-                      }}
-                    >
-                      <Avatar sx={{ bgcolor: alpha("#34d39e", 0.12), color: "primary.main", fontWeight: 700 }}>
-                        {job.title[0]}
-                      </Avatar>
+                  <Box
+                    key={job._id}
+                    sx={{
+                      p: 2, borderRadius: 2,
+                      border: `1px solid ${alpha("#ffffff", 0.06)}`,
+                      display: "flex", alignItems: "center", gap: 2,
+                      "&:hover": { borderColor: alpha("#34d39e", 0.4) },
+                      transition: "border-color .15s",
+                    }}
+                  >
+                    <Avatar sx={{ bgcolor: alpha("#34d39e", 0.12), color: "primary.main", fontWeight: 700 }}>
+                      {job.title[0]}
+                    </Avatar>
 
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                          <Typography variant="body1" sx={{ fontWeight: 600 }}>{job.title}</Typography>
-                          <Chip
-                            size="small"
-                            label={job.status}
-                            sx={{
-                              textTransform: "capitalize",
-                              bgcolor: job.status === "open" ? alpha("#34d39e", 0.15) : alpha("#ffffff", 0.08),
-                              color: job.status === "open" ? "primary.main" : "text.secondary",
-                              fontWeight: 600,
-                            }}
-                          />
-                        </Stack>
-                        <Typography variant="body2" color="text.secondary" noWrap>
-                          {job.company} · {job.location} · {timeAgo(job.createdAt)}
-                        </Typography>
-                      </Box>
-
-                      <Box sx={{ display: { xs: "none", md: "block" }, textAlign: "right", minWidth: 100 }}>
-                        <Typography variant="body2" sx={{ color: "primary.main", fontWeight: 600 }}>{formatSalary(job)}</Typography>
-                        <Typography variant="caption" color="text.secondary">{JOB_TYPE_LABELS[job.type] ?? job.type}</Typography>
-                      </Box>
-
-                      <Tooltip title="View applications">
-                        <Box
-                          onClick={() => setSelectedJob(job)}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                        <Typography variant="body1" sx={{ fontWeight: 600 }}>{job.title}</Typography>
+                        <Chip
+                          size="small"
+                          label={job.status}
                           sx={{
-                            display: { xs: "none", sm: "flex" }, flexDirection: "column",
-                            alignItems: "center", cursor: "pointer", minWidth: 50,
-                            "&:hover": { color: "primary.main" },
+                            textTransform: "capitalize",
+                            bgcolor: job.status === "open" ? alpha("#34d39e", 0.15) : alpha("#ffffff", 0.08),
+                            color: job.status === "open" ? "primary.main" : "text.secondary",
+                            fontWeight: 600,
                           }}
-                        >
-                          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>{job.applicationsCount}</Typography>
-                          <Typography variant="caption" color="text.secondary">apps</Typography>
-                        </Box>
-                      </Tooltip>
-
-                      <IconButton size="small" onClick={(e) => setAnchor({ el: e.currentTarget, job })}>
-                        <MoreVertIcon />
-                      </IconButton>
+                        />
+                      </Stack>
+                      <Typography variant="body2" color="text.secondary" noWrap>
+                        {job.company} · {job.location} · {timeAgo(job.createdAt)}
+                      </Typography>
                     </Box>
-                  ))}
+
+                    <Box sx={{ display: { xs: "none", md: "block" }, textAlign: "right", minWidth: 100 }}>
+                      <Typography variant="body2" sx={{ color: "primary.main", fontWeight: 600 }}>{formatSalary(job)}</Typography>
+                      <Typography variant="caption" color="text.secondary">{JOB_TYPE_LABELS[job.type] ?? job.type}</Typography>
+                    </Box>
+
+                    <Tooltip title="View applications">
+                      <Box
+                        onClick={() => setSelectedJob(job)}
+                        sx={{
+                          display: { xs: "none", sm: "flex" }, flexDirection: "column",
+                          alignItems: "center", cursor: "pointer", minWidth: 50,
+                          "&:hover": { color: "primary.main" },
+                        }}
+                      >
+                        <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>{job.applicationsCount}</Typography>
+                        <Typography variant="caption" color="text.secondary">apps</Typography>
+                      </Box>
+                    </Tooltip>
+
+                    <IconButton size="small" onClick={(e) => setAnchor({ el: e.currentTarget, job })}>
+                      <MoreVertIcon />
+                    </IconButton>
+                  </Box>
+                ))}
             </Stack>
 
             {!jobsLoading && (jobsData?.items.length ?? 0) === 0 && !jobsError && (
@@ -971,15 +967,15 @@ export default function RecruiterDashboard() {
             <Typography variant="h6" sx={{ mb: 2 }}>Pipeline health</Typography>
             {statsLoading
               ? [1, 2, 3, 4].map((i) => (
-                  <Box key={i} sx={{ mb: 2 }}>
-                    <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
-                      <Skeleton variant="text" width="40%" /><Skeleton variant="text" width="20%" />
-                    </Stack>
-                    <Skeleton variant="rounded" height={6} />
-                  </Box>
-                ))
+                <Box key={i} sx={{ mb: 2 }}>
+                  <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                    <Skeleton variant="text" width="40%" /><Skeleton variant="text" width="20%" />
+                  </Stack>
+                  <Skeleton variant="rounded" height={6} />
+                </Box>
+              ))
               : pipelineRows
-              ? pipelineRows.map((p) => (
+                ? pipelineRows.map((p) => (
                   <Box key={p.label} sx={{ mb: 2 }}>
                     <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
                       <Typography variant="body2">{p.label}</Typography>
@@ -991,7 +987,7 @@ export default function RecruiterDashboard() {
                     <LinearProgress variant="determinate" value={p.pct} sx={{ height: 6, borderRadius: 3 }} />
                   </Box>
                 ))
-              : <Typography variant="body2" color="text.secondary">Pipeline data unavailable.</Typography>}
+                : <Typography variant="body2" color="text.secondary">Pipeline data unavailable.</Typography>}
           </Card>
 
           <Card sx={{ p: 3 }}>
@@ -1077,10 +1073,17 @@ export default function RecruiterDashboard() {
         job={selectedJob}
         onClose={() => setSelectedJob(null)}
         onViewProfile={(id) => { setSelectedJob(null); setProfileUserId(id); }}
+        onViewApplication={(id) => { setSelectedJob(null); setDetailAppId(id); }}  // ← add this
       />
 
       {/* Profile drawer — calls fetchJobSeekerProfile */}
       <ProfileDrawer userId={profileUserId} onClose={() => setProfileUserId(null)} />
+
+      <ApplicationDetailDrawer
+        applicationId={detailAppId}
+        onClose={() => setDetailAppId(null)}
+        onViewProfile={(id) => { setDetailAppId(null); setSelectedJob(null); setProfileUserId(id); }}
+      />
     </Container>
   );
 }

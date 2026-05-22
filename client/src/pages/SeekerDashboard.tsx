@@ -44,7 +44,6 @@ import { useAuth } from "../lib/auth";
 import {
   getMyProfile,
   updateMyProfile,
-  updateUserInfo,
   getMyApplications,
   getRecommendedJobs,
   withdrawApplication,

@@ -12,7 +12,6 @@ import { alpha } from "@mui/material/styles";
 const links = [
   { to: "/jobs", label: "Find Jobs" },
   { to: "/talent", label: "Talent" },
-  { to: "/dashboard", label: "Recruiters" },
 ];
 
 export default function SiteNav() {
