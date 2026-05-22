@@ -146,6 +146,6 @@ export function useAuth() {
 // Demo credentials kept for convenience (autofill button)
 export const demoCredentials = {
   admin: { email: "admin@platform.com", password: "Admin@1234" },
-  recruiter: { email: "recruiter@RagasHire.com", password: "Recruit123" },
+  recruiter: { email: "recruiter@RagasHire.com", password: "Recruit@123" },
   job_seeker: { email: "jobseeker@RagasHire.com", password: "seeker@123" },
 };

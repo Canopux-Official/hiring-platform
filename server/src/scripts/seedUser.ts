@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "../models/User";
+import JobSeekerProfile from "../models/JobSeekerProfile"; // <-- Import the profile model
 import { Role } from "../types";
 
 dotenv.config();
@@ -34,11 +35,32 @@ async function seedUsers() {
 
     if (existing) {
       console.log(`⏭️  Skipping "${userData.email}" — already exists.`);
+      
+      // Secondary check: If the user exists but somehow misses a profile, we handle it
+      if (userData.role === Role.JOB_SEEKER) {
+        const profileExists = await JobSeekerProfile.findOne({ user: existing._id });
+        if (!profileExists) {
+          await JobSeekerProfile.create({ user: existing._id });
+          console.log(`🆕 Created missing profile for existing Job Seeker: ${userData.email}`);
+        }
+      }
       continue;
     }
 
-    await User.create(userData);
+    // 1. Create the base User
+    const newUser = await User.create(userData);
     console.log(`✅ Created [${userData.role}] → ${userData.email}`);
+
+    // 2. Conditionally create the empty profile if the role is JOB_SEEKER
+    if (userData.role === Role.JOB_SEEKER) {
+      await JobSeekerProfile.create({
+        user: newUser._id, // Links the profile to the newly created user
+        skills: [],
+        experience: [],
+        education: []
+      });
+      console.log(`👤 Profile linked for Job Seeker: ${userData.email}`);
+    }
   }
 
   console.log("\n🎉 Seeding complete.");
