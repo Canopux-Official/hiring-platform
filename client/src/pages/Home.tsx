@@ -26,7 +26,7 @@ const features = [
 ];
 
 const testimonials = [
-  { name: "Lena Park", role: "Head of Talent, FlowState AI", quote: "We filled three staff engineering seats in 11 days. HireSphere's match scores were genuinely accurate.", avatar: "LP" },
+  { name: "Lena Park", role: "Head of Talent, FlowState AI", quote: "We filled three staff engineering seats in 11 days. RagasHire's match scores were genuinely accurate.", avatar: "LP" },
   { name: "Rohan Mehta", role: "COO, RapidMile", quote: "Hiring 200 riders used to take a month. Now it's two weeks and the retention is up.", avatar: "RM" },
   { name: "Amélie Roux", role: "Founder, Northwave Studio", quote: "The creative pool is curated. Every shortlist felt hand-picked.", avatar: "AR" },
 ];
@@ -90,7 +90,7 @@ export default function Home() {
           <Typography variant="overline" color="primary.main" sx={{ letterSpacing: "0.2em" }}>What's inside</Typography>
           <Typography variant="h2" sx={{ fontSize: { xs: 32, md: 48 }, mt: 1, mb: 2 }}>One platform. Every hire.</Typography>
           <Typography color="text.secondary" sx={{ maxWidth: 600, mx: "auto" }}>
-            HireSphere brings every kind of work — from boardroom to warehouse floor — into one cohesive, intelligent hiring experience.
+            RagasHire brings every kind of work — from boardroom to warehouse floor — into one cohesive, intelligent hiring experience.
           </Typography>
         </Box>
         <Grid container spacing={3}>

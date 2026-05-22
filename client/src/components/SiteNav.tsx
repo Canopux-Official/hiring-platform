@@ -56,7 +56,7 @@ export default function SiteNav() {
           }}>
             <HubOutlinedIcon sx={{ color: "#06140f", fontSize: 22 }} />
           </Box>
-          <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: "-0.02em" }}>HireSphere</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: "-0.02em" }}>RagasHire</Typography>
         </Box>
 
         {!isMobile && (

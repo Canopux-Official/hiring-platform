@@ -14,13 +14,13 @@ const SEED_USERS = [
   },
   {
     name: "Demo Recruiter",
-    email: "recruiter@hiresphere.com",
+    email: "recruiter@RagasHire.com",
     password: "Recruit@123",
     role: Role.RECRUITER,
   },
   {
     name: "Demo Job Seeker",
-    email: "jobseeker@hiresphere.com",
+    email: "jobseeker@RagasHire.com",
     password: "seeker@123",
     role: Role.JOB_SEEKER,
   },

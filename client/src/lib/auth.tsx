@@ -42,7 +42,7 @@ interface AuthCtx {
 }
 
 // ─── Storage key (UI state only – the real session lives in the cookie) ───────
-const STORAGE = "hiresphere.auth.v1";
+const STORAGE = "RagasHire.auth.v1";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -146,6 +146,6 @@ export function useAuth() {
 // Demo credentials kept for convenience (autofill button)
 export const demoCredentials = {
   admin: { email: "admin@platform.com", password: "Admin@1234" },
-  recruiter: { email: "recruiter@hiresphere.com", password: "Recruit123" },
-  job_seeker: { email: "jobseeker@hiresphere.com", password: "seeker@123" },
+  recruiter: { email: "recruiter@RagasHire.com", password: "Recruit123" },
+  job_seeker: { email: "jobseeker@RagasHire.com", password: "seeker@123" },
 };

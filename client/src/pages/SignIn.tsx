@@ -193,7 +193,7 @@ export default function SignIn() {
             >
               <Box sx={{ textAlign: "center", mb: 5 }}>
                 <Typography variant="h2" sx={{ fontSize: { xs: 32, md: 48 }, mb: 1 }}>
-                  Welcome to HireSphere
+                  Welcome to RagasHire
                 </Typography>
                 <Typography color="text.secondary">
                   Choose how you'd like to use the platform
@@ -483,7 +483,7 @@ export default function SignIn() {
                   Create your account
                 </Typography>
                 <Typography color="text.secondary" sx={{ mb: 3 }}>
-                  Join HireSphere as a{" "}
+                  Join RagasHire as a{" "}
                   {role === "recruiter" ? "recruiter" : "job seeker"}.
                 </Typography>
 

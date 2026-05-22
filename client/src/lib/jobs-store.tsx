@@ -34,7 +34,7 @@ export interface Job {
   isUserPosted?: boolean;
 }
 
-const STORAGE_KEY = "hiresphere.jobs.v1";
+const STORAGE_KEY = "RagasHire.jobs.v1";
 
 const seedJobs: Job[] = [
   {

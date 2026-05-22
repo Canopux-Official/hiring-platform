@@ -1,6 +1,6 @@
-# HireSphere — React + TypeScript + Material UI
+# RagasHire — React + TypeScript + Material UI
 
-The AI-powered global hiring platform — a faithful MUI port of the original HireSphere Lovable build.
+The AI-powered global hiring platform — a faithful MUI port of the original RagasHire Lovable build.
 
 ## Stack
 
@@ -34,8 +34,8 @@ The auth is mocked in `src/lib/auth.tsx` and persisted via `localStorage`.
 
 | Role        | Email                          | Password    |
 |-------------|--------------------------------|-------------|
-| Recruiter   | `recruiter@hiresphere.com`     | `Recruit123`|
-| Job Seeker  | `jobseeker@hiresphere.com`     | `Job123`    |
+| Recruiter   | `recruiter@RagasHire.com`     | `Recruit123`|
+| Job Seeker  | `jobseeker@RagasHire.com`     | `Job123`    |
 
 Use the **Autofill** button on the sign-in screen.
 

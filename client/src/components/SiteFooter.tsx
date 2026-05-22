@@ -8,7 +8,7 @@ export default function SiteFooter() {
       <Container maxWidth="lg">
         <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" spacing={4}>
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800 }}>HireSphere</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>RagasHire</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1, maxWidth: 360 }}>
               The AI-powered global hiring platform. From executive search to skilled trades — verified, ranked and matched in real time.
             </Typography>
@@ -29,7 +29,7 @@ export default function SiteFooter() {
           </Stack>
         </Stack>
         <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 5 }}>
-          © {new Date().getFullYear()} HireSphere. All rights reserved.
+          © {new Date().getFullYear()} RagasHire. All rights reserved.
         </Typography>
       </Container>
     </Box>
