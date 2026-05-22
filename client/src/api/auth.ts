@@ -3,7 +3,7 @@
 
 import type { Role } from "../lib/auth";
 
-const BASE = "/api/auth";
+const BASE = `${import.meta.env.VITE_API_URL}/api/auth`;
 
 export interface ApiUser {
   email: string;
