@@ -23,6 +23,19 @@ export default function SiteNav() {
   const [anchor, setAnchor] = useState<null | HTMLElement>(null);
   const [drawer, setDrawer] = useState(false);
 
+  const getDashboardRoute = () => {
+    if (user?.role === "admin") return "/admin";
+    if (user?.role === "recruiter") return "/dashboard";
+    return "/seeker";
+  };
+
+  // Helper function to return the user's role display string
+  const getRoleLabel = () => {
+    if (user?.role === "admin") return "Admin";
+    if (user?.role === "recruiter") return "Recruiter";
+    return "Job Seeker";
+  };
+
   return (
     <AppBar
       position="sticky"
@@ -70,7 +83,7 @@ export default function SiteNav() {
         {user ? (
           <>
             <Chip
-              label={user.role === "recruiter" ? "Recruiter" : "Job Seeker"}
+              label={getRoleLabel()}
               size="small"
               sx={{ mr: 1.5, bgcolor: alpha("#34d39e", 0.12), color: "primary.main", fontWeight: 600, display: { xs: "none", sm: "inline-flex" } }}
             />
@@ -86,7 +99,7 @@ export default function SiteNav() {
                   <Typography variant="caption" color="text.secondary">{user.email}</Typography>
                 </Box>
               </MenuItem>
-              <MenuItem onClick={() => { setAnchor(null); nav(user.role === "recruiter" ? "/dashboard" : "/seeker"); }}>
+              <MenuItem onClick={() => { setAnchor(null); nav(getDashboardRoute()); }}>
                 Dashboard
               </MenuItem>
               <MenuItem onClick={() => { setAnchor(null); signOut(); nav("/"); }}>Sign out</MenuItem>

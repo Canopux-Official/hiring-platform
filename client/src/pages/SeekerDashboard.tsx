@@ -39,6 +39,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import StarIcon from "@mui/icons-material/Star";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import HistoryIcon from "@mui/icons-material/History";
 
 import { useAuth } from "../lib/auth";
 import {
@@ -684,6 +685,14 @@ function ApplicationsTab({
     );
   }
 
+  const STATUS_COLOR: Record<string, "default" | "warning" | "info" | "error" | "success"> = {
+    pending: "default",
+    reviewed: "warning",
+    shortlisted: "info",
+    rejected: "error",
+    hired: "success",
+  };
+
   return (
     <Stack spacing={2}>
       {applications.map((app) => {
@@ -714,18 +723,62 @@ function ApplicationsTab({
                 {/* Status history mini-timeline */}
                 {app.statusHistory.length > 1 && (
                   <Box sx={{ mt: 2 }}>
-                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
-                      Timeline
-                    </Typography>
-                    <Stack spacing={0.5}>
-                      {app.statusHistory.map((h, i) => (
-                        <Stack key={i} direction="row" spacing={1} alignItems="center">
-                          <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: "primary.main", flexShrink: 0 }} />
-                          <Typography variant="caption" color="text.secondary">
-                            <b>{STATUS_META[h.status]?.label ?? h.status}</b> · {timeAgo(h.changedAt)}
-                            {h.note ? ` — ${h.note}` : ""}
-                          </Typography>
-                        </Stack>
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
+                      <HistoryIcon sx={{ fontSize: 15, color: "text.secondary" }} />
+                      <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 1 }}>
+                        Timeline
+                      </Typography>
+                    </Stack>
+
+                    <Stack spacing={0}>
+                      {app.statusHistory.map((h, i, arr) => (
+                        <Box key={i} sx={{ display: "flex", gap: 1.5, position: "relative" }}>
+
+                          {i < arr.length - 1 && (
+                            <Box sx={{
+                              position: "absolute",
+                              left: 6, top: 20, bottom: 0,
+                              width: "1px",
+                              bgcolor: alpha("#ffffff", 0.1),
+                            }} />
+                          )}
+
+                          <Box sx={{
+                            width: 13, height: 13,
+                            borderRadius: "50%",
+                            flexShrink: 0,
+                            mt: "4px",
+                            bgcolor: i === arr.length - 1 ? "primary.main" : alpha("#ffffff", 0.12),
+                            border: `2px solid ${i === arr.length - 1 ? "primary.main" : alpha("#ffffff", 0.2)}`,
+                            zIndex: 1,
+                          }} />
+
+                          <Box sx={{ pb: 2.5, flex: 1 }}>
+                            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                              <Chip
+                                size="small"
+                                label={STATUS_META[h.status]?.label ?? h.status}
+                                color={STATUS_COLOR[h.status] ?? "default"}
+                                sx={{
+                                  textTransform: "capitalize",
+                                  height: 22,
+                                  fontSize: "0.7rem",
+                                  fontWeight: 600,
+                                  "& .MuiChip-label": { px: 1 },
+                                }}
+                              />
+                              <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem" }}>
+                                {timeAgo(h.changedAt)}
+                              </Typography>
+                            </Stack>
+                            {h.note && (
+                              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5, fontSize: "0.72rem" }}>
+                                {h.note}
+                              </Typography>
+                            )}
+                          </Box>
+
+                        </Box>
                       ))}
                     </Stack>
                   </Box>

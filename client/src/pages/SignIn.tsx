@@ -1,5 +1,5 @@
 // pages/SignIn.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -20,6 +20,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import BusinessIcon from "@mui/icons-material/Business";
 import PersonIcon from "@mui/icons-material/Person";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { motion, AnimatePresence } from "framer-motion";
 import { alpha } from "@mui/material/styles";
@@ -45,7 +46,15 @@ const emptyForm = (): FormState => ({
   phone: "",
 });
 
-// ─── Password strength (mirrors your registerSchema) ─────────────────────────
+// ─── Role → route mapping ─────────────────────────────────────────────────────
+
+function roleHome(role: Role): string {
+  if (role === "admin") return "/admin";
+  if (role === "recruiter") return "/dashboard";
+  return "/seeker";
+}
+
+// ─── Password strength ────────────────────────────────────────────────────────
 
 function validatePassword(pwd: string): string | null {
   if (pwd.length < 8) return "Password must be at least 8 characters.";
@@ -65,8 +74,17 @@ export default function SignIn() {
   const [err, setErr] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const { signIn, register } = useAuth();
+  const { signIn, register, user, loading } = useAuth();
   const nav = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user) {
+      nav(roleHome(user.role), { replace: true });
+    }
+  }, [loading, user, nav]);
+
+  // Show nothing (or a spinner) while auth state is being rehydrated
+  if (loading) return null;
 
   // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -89,6 +107,7 @@ export default function SignIn() {
     setErr("");
   };
 
+  // Autofill uses the actual role — including admin
   const autofill = () => {
     const c = demoCredentials[role];
     setForm((prev) => ({ ...prev, email: c.email, password: c.password }));
@@ -101,15 +120,13 @@ export default function SignIn() {
     setErr("");
     setSubmitting(true);
     try {
-      const r = await signIn(form.email, form.password, role);
-      if (!r.ok) { 
-        setErr(r.error ?? "Sign in failed."); 
-        return; 
+      const result = await signIn(form.email, form.password, role);
+      if (!result.ok) {
+        setErr(result.error ?? "Sign in failed.");
+        return;
       }
-      
-      // Show success message and redirect to home page
-      alert("Sign in successful!"); 
-      nav("/seeker");
+      // Navigate based on the role the user selected (which the backend confirmed)
+      nav(roleHome(role), { replace: true });
     } finally {
       setSubmitting(false);
     }
@@ -134,15 +151,15 @@ export default function SignIn() {
 
     setSubmitting(true);
     try {
-      const r = await register({
+      const result = await register({
         name: form.name.trim(),
         email: form.email.trim(),
         password: form.password,
         role,
         phone: form.phone.trim() || undefined,
       });
-      if (!r.ok) { setErr(r.error ?? "Registration failed."); return; }
-      nav(role === "recruiter" ? "/dashboard" : "/seeker");
+      if (!result.ok) { setErr(result.error ?? "Registration failed."); return; }
+      nav(roleHome(role), { replace: true });
     } finally {
       setSubmitting(false);
     }
@@ -191,32 +208,47 @@ export default function SignIn() {
                       title: "Recruiter / Hirer",
                       desc: "Post jobs, find verified talent, manage pipelines.",
                       icon: <BusinessIcon sx={{ fontSize: 40 }} />,
+                      showRegister: true,
                     },
                     {
                       value: "job_seeker" as Role,
                       title: "Job Seeker",
                       desc: "Get matched, apply faster, track every conversation.",
                       icon: <PersonIcon sx={{ fontSize: 40 }} />,
+                      showRegister: true,
                     },
-                    // {
-                    //   value: "admin" as Role,
-                    //   title: "Administrator",
-                    //   desc: "Manage the platform and all users.",
-                    //   icon: <AdminPanelSettingsIcon sx={{ fontSize: 40 }} />,
-                    // },
+                    {
+                      value: "admin" as Role,
+                      title: "Administrator",
+                      desc: "Manage platform users, jobs, and all applications.",
+                      icon: <AdminPanelSettingsIcon sx={{ fontSize: 40 }} />,
+                      showRegister: false, // admins are seeded — no self-registration
+                    },
                   ] as const
                 ).map((opt) => (
-                  <Grid item xs={12} md={6} key={opt.value}>
+                  <Grid item xs={12} md={opt.value === "admin" ? 12 : 6} key={opt.value}>
                     <Card
                       sx={{
                         p: 4,
                         cursor: "pointer",
                         height: "100%",
                         transition: "all 0.3s",
+                        // Subtle pink tint for admin to make it visually distinct
+                        ...(opt.value === "admin" && {
+                          borderColor: alpha("#f472b6", 0.2),
+                          maxWidth: { md: 400 },
+                          mx: "auto",
+                        }),
                         "&:hover": {
                           transform: "translateY(-6px)",
-                          borderColor: alpha("#34d39e", 0.5),
-                          boxShadow: `0 0 60px -10px ${alpha("#34d39e", 0.4)}`,
+                          borderColor: alpha(
+                            opt.value === "admin" ? "#f472b6" : "#34d39e",
+                            0.5
+                          ),
+                          boxShadow: `0 0 60px -10px ${alpha(
+                            opt.value === "admin" ? "#f472b6" : "#34d39e",
+                            0.4
+                          )}`,
                         },
                       }}
                     >
@@ -226,8 +258,12 @@ export default function SignIn() {
                           height: 72,
                           borderRadius: 3,
                           mb: 3,
-                          bgcolor: alpha("#34d39e", 0.12),
-                          color: "primary.main",
+                          bgcolor: alpha(
+                            opt.value === "admin" ? "#f472b6" : "#34d39e",
+                            0.12
+                          ),
+                          color:
+                            opt.value === "admin" ? "#f472b6" : "primary.main",
                           display: "grid",
                           placeItems: "center",
                         }}
@@ -241,24 +277,30 @@ export default function SignIn() {
                         {opt.desc}
                       </Typography>
 
-                      {/* Sign in / Register split */}
                       <Stack direction="row" spacing={1.5}>
                         <Button
                           variant="contained"
                           size="small"
                           fullWidth
                           onClick={() => pickRole(opt.value, "signIn")}
+                          sx={
+                            opt.value === "admin"
+                              ? { bgcolor: "#f472b6", "&:hover": { bgcolor: "#ec4899" } }
+                              : {}
+                          }
                         >
                           Sign In
                         </Button>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          fullWidth
-                          onClick={() => pickRole(opt.value, "register")}
-                        >
-                          Register
-                        </Button>
+                        {opt.showRegister && (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            onClick={() => pickRole(opt.value, "register")}
+                          >
+                            Register
+                          </Button>
+                        )}
                       </Stack>
                     </Card>
                   </Grid>
@@ -281,7 +323,11 @@ export default function SignIn() {
                     <ArrowBackIcon />
                   </IconButton>
                   <Typography variant="overline" color="text.secondary">
-                    {role === "recruiter" ? "Recruiter sign in" : "Job seeker sign in"}
+                    {role === "recruiter"
+                      ? "Recruiter sign in"
+                      : role === "admin"
+                      ? "Admin sign in"
+                      : "Job seeker sign in"}
                   </Typography>
                 </Stack>
 
@@ -289,7 +335,9 @@ export default function SignIn() {
                   Welcome back
                 </Typography>
                 <Typography color="text.secondary" sx={{ mb: 3 }}>
-                  Use the demo credentials or click autofill.
+                  {role === "admin"
+                    ? "Sign in with your admin credentials."
+                    : "Use the demo credentials or click autofill."}
                 </Typography>
 
                 <form onSubmit={handleSignIn}>
@@ -314,7 +362,10 @@ export default function SignIn() {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton onClick={() => setShowPwd((v) => !v)} edge="end">
+                            <IconButton
+                              onClick={() => setShowPwd((v) => !v)}
+                              edge="end"
+                            >
                               {showPwd ? <VisibilityOffIcon /> : <VisibilityIcon />}
                             </IconButton>
                           </InputAdornment>
@@ -330,29 +381,52 @@ export default function SignIn() {
                       size="large"
                       fullWidth
                       disabled={submitting}
-                      startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+                      startIcon={
+                        submitting ? (
+                          <CircularProgress size={16} color="inherit" />
+                        ) : undefined
+                      }
+                      sx={
+                        role === "admin"
+                          ? { bgcolor: "#f472b6", "&:hover": { bgcolor: "#ec4899" } }
+                          : {}
+                      }
                     >
                       {submitting ? "Signing in…" : "Sign In"}
                     </Button>
 
-                    <Button onClick={autofill} variant="outlined" size="small" fullWidth disabled={submitting}>
+                    <Button
+                      onClick={autofill}
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      disabled={submitting}
+                    >
                       Autofill demo credentials
                     </Button>
 
-                    <Divider>
-                      <Typography variant="caption" color="text.secondary">
-                        or
-                      </Typography>
-                    </Divider>
-
-                    <Button
-                      variant="text"
-                      size="small"
-                      fullWidth
-                      onClick={() => { setForm(emptyForm()); setErr(""); setStep("register"); }}
-                    >
-                      Don't have an account? Register
-                    </Button>
+                    {/* Only show register link for non-admin roles */}
+                    {role !== "admin" && (
+                      <>
+                        <Divider>
+                          <Typography variant="caption" color="text.secondary">
+                            or
+                          </Typography>
+                        </Divider>
+                        <Button
+                          variant="text"
+                          size="small"
+                          fullWidth
+                          onClick={() => {
+                            setForm(emptyForm());
+                            setErr("");
+                            setStep("register");
+                          }}
+                        >
+                          Don't have an account? Register
+                        </Button>
+                      </>
+                    )}
                   </Stack>
                 </form>
 
@@ -360,11 +434,18 @@ export default function SignIn() {
                   sx={{
                     mt: 3,
                     p: 2,
-                    bgcolor: alpha("#34d39e", 0.06),
+                    bgcolor: alpha(
+                      role === "admin" ? "#f472b6" : "#34d39e",
+                      0.06
+                    ),
                     borderRadius: 2,
                   }}
                 >
-                  <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mb: 0.5 }}
+                  >
                     Demo account
                   </Typography>
                   <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
@@ -392,7 +473,9 @@ export default function SignIn() {
                     <ArrowBackIcon />
                   </IconButton>
                   <Typography variant="overline" color="text.secondary">
-                    {role === "recruiter" ? "Recruiter registration" : "Job seeker registration"}
+                    {role === "recruiter"
+                      ? "Recruiter registration"
+                      : "Job seeker registration"}
                   </Typography>
                 </Stack>
 
@@ -400,7 +483,8 @@ export default function SignIn() {
                   Create your account
                 </Typography>
                 <Typography color="text.secondary" sx={{ mb: 3 }}>
-                  Join HireSphere as a {role === "recruiter" ? "recruiter" : "job seeker"}.
+                  Join HireSphere as a{" "}
+                  {role === "recruiter" ? "recruiter" : "job seeker"}.
                 </Typography>
 
                 <form onSubmit={handleRegister}>
@@ -443,7 +527,10 @@ export default function SignIn() {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton onClick={() => setShowPwd((v) => !v)} edge="end">
+                            <IconButton
+                              onClick={() => setShowPwd((v) => !v)}
+                              edge="end"
+                            >
                               {showPwd ? <VisibilityOffIcon /> : <VisibilityIcon />}
                             </IconButton>
                           </InputAdornment>
@@ -461,8 +548,15 @@ export default function SignIn() {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton onClick={() => setShowConfirm((v) => !v)} edge="end">
-                              {showConfirm ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            <IconButton
+                              onClick={() => setShowConfirm((v) => !v)}
+                              edge="end"
+                            >
+                              {showConfirm ? (
+                                <VisibilityOffIcon />
+                              ) : (
+                                <VisibilityIcon />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         ),
@@ -477,7 +571,11 @@ export default function SignIn() {
                       size="large"
                       fullWidth
                       disabled={submitting}
-                      startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+                      startIcon={
+                        submitting ? (
+                          <CircularProgress size={16} color="inherit" />
+                        ) : undefined
+                      }
                     >
                       {submitting ? "Creating account…" : "Create Account"}
                     </Button>
@@ -492,7 +590,11 @@ export default function SignIn() {
                       variant="text"
                       size="small"
                       fullWidth
-                      onClick={() => { setForm(emptyForm()); setErr(""); setStep("signIn"); }}
+                      onClick={() => {
+                        setForm(emptyForm());
+                        setErr("");
+                        setStep("signIn");
+                      }}
                     >
                       Already have an account? Sign in
                     </Button>

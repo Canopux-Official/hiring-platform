@@ -80,6 +80,7 @@ export async function apiLogin(payload: {
   password: string;
   role: Role;
 }): Promise<ApiResult<AuthResponse>> {
+  console.log("Logging in with payload:", payload);
   return request<AuthResponse>("/login", {
     method: "POST",
     body: JSON.stringify(payload),

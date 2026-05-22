@@ -374,6 +374,8 @@ function ApplicationDetailDrawer({ applicationId, onClose, onViewProfile }: Appl
     hired: "success",
   };
 
+  console.log(app)
+
   return (
     <Drawer
       anchor="right"
@@ -488,46 +490,65 @@ function ApplicationDetailDrawer({ applicationId, onClose, onViewProfile }: Appl
             {/* Status history */}
             {app.statusHistory && app.statusHistory.length > 0 && (
               <Box>
-                <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                  <HistoryIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
+                  <HistoryIcon sx={{ fontSize: 15, color: "text.secondary" }} />
                   <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 1 }}>
                     Status History
                   </Typography>
                 </Stack>
+
                 <Stack spacing={0}>
-                  {[...app.statusHistory].reverse().map((h, i) => (
+                  {[...app.statusHistory].reverse().map((h, i, arr) => (
                     <Box
                       key={i}
-                      sx={{
-                        display: "flex", gap: 2, pb: 2,
-                        position: "relative",
-                        "&::before": i < app.statusHistory.length - 1 ? {
-                          content: '""', position: "absolute",
-                          left: 7, top: 20, bottom: 0, width: 1,
-                          bgcolor: alpha("#ffffff", 0.08),
-                        } : {},
-                      }}
+                      sx={{ display: "flex", gap: 1.5, position: "relative" }}
                     >
-                      {/* Timeline dot */}
+                      {/* Vertical line */}
+                      {i < arr.length - 1 && (
+                        <Box sx={{
+                          position: "absolute",
+                          left: 6,
+                          top: 20,
+                          bottom: 0,
+                          width: "1px",
+                          bgcolor: alpha("#ffffff", 0.1),
+                        }} />
+                      )}
+
+                      {/* Dot */}
                       <Box sx={{
-                        width: 16, height: 16, borderRadius: "50%", flexShrink: 0, mt: 0.25,
-                        bgcolor: i === 0 ? "primary.main" : alpha("#ffffff", 0.15),
-                        border: `2px solid ${i === 0 ? "primary.main" : alpha("#ffffff", 0.1)}`,
+                        width: 13, height: 13,
+                        borderRadius: "50%",
+                        flexShrink: 0,
+                        mt: "4px",
+                        bgcolor: i === 0 ? "primary.main" : alpha("#ffffff", 0.12),
+                        border: `2px solid ${i === 0 ? "primary.main" : alpha("#ffffff", 0.2)}`,
+                        zIndex: 1,
                       }} />
-                      <Box>
-                        <Stack direction="row" spacing={1} alignItems="center">
+
+                      {/* Content */}
+                      <Box sx={{ pb: 2.5, flex: 1 }}>
+                        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                           <Chip
                             size="small"
                             label={h.status}
                             color={STATUS_COLOR[h.status] ?? "default"}
-                            sx={{ textTransform: "capitalize", height: 20, fontSize: 11 }}
+                            sx={{
+                              textTransform: "capitalize",
+                              height: 22,
+                              fontSize: "0.7rem",
+                              fontWeight: 600,
+                              "& .MuiChip-label": { px: 1 },
+                            }}
                           />
-                          <Typography variant="caption" color="text.disabled">
-                            {new Date(h.changedAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}
+                          <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.7rem" }}>
+                            {new Date(h.changedAt).toLocaleDateString(undefined, {
+                              day: "numeric", month: "short", year: "numeric"
+                            })}
                           </Typography>
                         </Stack>
                         {h.note && (
-                          <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.25 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5, fontSize: "0.72rem" }}>
                             {h.note}
                           </Typography>
                         )}
@@ -561,7 +582,7 @@ function ApplicationsModal({ job, onClose, onViewProfile, onViewApplication }: A
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [detailAppId, setDetailAppId] = useState<string | null>(null); // application detail drawer
+  // const [detailAppId, setDetailAppId] = useState<string | null>(null); // application detail drawer
 
   const load = useCallback((p: number) => {
     if (!job) return;
@@ -713,6 +734,12 @@ function ApplicationsModal({ job, onClose, onViewProfile, onViewApplication }: A
         </DialogActions>
       )}
 
+      {/* Application detail drawer — calls GET /applications/:id */}
+      {/* <ApplicationDetailDrawer
+        applicationId={detailAppId}
+        onClose={() => setDetailAppId(null)}
+        onViewProfile={(id) => { setDetailAppId(null); onClose(); onViewProfile(id); }}
+      /> */}
     </Dialog>
   );
 }
@@ -1073,7 +1100,17 @@ export default function RecruiterDashboard() {
         job={selectedJob}
         onClose={() => setSelectedJob(null)}
         onViewProfile={(id) => { setSelectedJob(null); setProfileUserId(id); }}
-        onViewApplication={(id) => { setSelectedJob(null); setDetailAppId(id); }}  // ← add this
+        onViewApplication={(id) => {setSelectedJob(null); setDetailAppId(id)}} // ← add
+      />
+
+      <ApplicationDetailDrawer
+        applicationId={detailAppId}
+        onClose={() => setDetailAppId(null)}
+        onViewProfile={(id) => {
+          setDetailAppId(null);
+          setSelectedJob(null);
+          setProfileUserId(id);
+        }}
       />
 
       {/* Profile drawer — calls fetchJobSeekerProfile */}
