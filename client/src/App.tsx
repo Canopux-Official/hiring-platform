@@ -8,14 +8,39 @@ import Talent from "./pages/Talent";
 import SignIn from "./pages/SignIn";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import SeekerDashboard from "./pages/SeekerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import { useAuth } from "./lib/auth";
+import type { Role } from "./lib/auth";
 
-function RequireRole({ role, children }: { role: "recruiter" | "job_seeker"; children: React.ReactNode }) {
-  const { user } = useAuth();
+// ─── Role-based redirect helper ───────────────────────────────────────────────
+
+function roleHome(role: Role): string {
+  if (role === "admin") return "/admin";
+  if (role === "recruiter") return "/dashboard";
+  return "/seeker";
+}
+
+// ─── Generic role guard ────────────────────────────────────────────────────────
+// Redirects unauthenticated users to /signin.
+// Redirects authenticated users with the wrong role to their own home.
+
+function RequireRole({ role, children }: { role: Role | Role[]; children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+
+  // Still rehydrating from cookie — render nothing to avoid flash
+  if (loading) return null;
+
   if (!user) return <Navigate to="/signin" replace />;
-  if (user.role !== role) return <Navigate to={user.role === "recruiter" ? "/dashboard" : "/seeker"} replace />;
+
+  const allowed = Array.isArray(role) ? role : [role];
+  if (!allowed.includes(user.role)) {
+    return <Navigate to={roleHome(user.role)} replace />;
+  }
+
   return <>{children}</>;
 }
+
+// ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
   return (
@@ -23,12 +48,43 @@ export default function App() {
       <SiteNav />
       <Box component="main" sx={{ flex: 1 }}>
         <Routes>
+          {/* Public */}
           <Route path="/" element={<Home />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/talent" element={<Talent />} />
           <Route path="/signin" element={<SignIn />} />
-          <Route path="/dashboard" element={<RequireRole role="recruiter"><RecruiterDashboard /></RequireRole>} />
-          <Route path="/seeker" element={<RequireRole role="job_seeker"><SeekerDashboard /></RequireRole>} />
+
+          {/* Protected — Recruiter */}
+          <Route
+            path="/dashboard"
+            element={
+              <RequireRole role="recruiter">
+                <RecruiterDashboard />
+              </RequireRole>
+            }
+          />
+
+          {/* Protected — Job Seeker */}
+          <Route
+            path="/seeker"
+            element={
+              <RequireRole role="job_seeker">
+                <SeekerDashboard />
+              </RequireRole>
+            }
+          />
+
+          {/* Protected — Admin */}
+          <Route
+            path="/admin"
+            element={
+              <RequireRole role="admin">
+                <AdminDashboard />
+              </RequireRole>
+            }
+          />
+
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Box>
