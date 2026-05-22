@@ -1047,9 +1047,9 @@ export default function RecruiterDashboard() {
         <MenuItem onClick={() => { if (anchor) setSelectedJob(anchor.job); setAnchor(null); }}>
           View applications
         </MenuItem>
-        <MenuItem onClick={() => { if (anchor) { setEditingJob(anchor.job); setAnchor(null); } }}>
+        {/* <MenuItem onClick={() => { if (anchor) { setEditingJob(anchor.job); setAnchor(null); } }}>
           <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
-        </MenuItem>
+        </MenuItem> */}
         <Divider />
         <MenuItem
           onClick={() => { if (anchor) setDeleteConfirm(anchor.job); setAnchor(null); }}
