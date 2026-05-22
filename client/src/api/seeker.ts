@@ -1,7 +1,7 @@
 // api/seekerApi.ts
 // All seeker-facing API calls. Adjust BASE_URL / auth header to match your setup.
 
-const BASE_URL = `${import.meta.env.VITE_API_URL}/api`; 
+const BASE_URL = `/api`; 
 
 function authHeaders(): HeadersInit {
   return {

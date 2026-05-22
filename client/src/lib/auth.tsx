@@ -147,5 +147,5 @@ export function useAuth() {
 export const demoCredentials = {
   admin: { email: "admin@platform.com", password: "Admin@1234" },
   recruiter: { email: "recruiter@hiresphere.com", password: "Recruit123" },
-  job_seeker: { email: "jobseeker@hiresphere.com", password: "Job123" },
+  job_seeker: { email: "jobseeker@hiresphere.com", password: "seeker@123" },
 };

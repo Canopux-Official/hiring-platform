@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE = `${import.meta.env.VITE_API_URL}/api`;
+const BASE = `/api`;
 
 export type JobType =
   | "full_time"
