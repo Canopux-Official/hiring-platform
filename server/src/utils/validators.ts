@@ -45,6 +45,7 @@ export const createJobSchema = z.object({
 
 export const updateJobSchema = createJobSchema.partial().extend({
   status: z.nativeEnum(JobStatus).optional(),
+  resumeUrl: z.string().url().optional().or(z.literal("")),
 });
 
 // ─── Application ──────────────────────────────────────────────────────────────
@@ -61,6 +62,7 @@ export const updateApplicationStatusSchema = z.object({
 export const updateProfileSchema = z.object({
   headline: z.string().max(120).optional(),
   bio: z.string().max(2000).optional(),
+  resumeUrl: z.string().url().optional().or(z.literal("")),
   skills: z.array(z.string()).optional(),
   expectedSalary: z.number().positive().optional(),
   currentSalary: z.number().positive().optional(),

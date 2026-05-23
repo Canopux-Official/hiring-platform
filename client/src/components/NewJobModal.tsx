@@ -50,7 +50,7 @@ const empty = {
   title: "", company: "", category: "Engineering",
   employmentType: "Full-time" as EmploymentType,
   workMode: "Remote" as WorkMode,
-  location: "", currency: "INR", salaryMin: 500000, salaryMax: 1200000,
+  location: "", currency: "INR", salaryMin: 0, salaryMax: 0,
   experience: "3+ years", skills: [] as string[],
   description: "", responsibilities: "", requirements: "", benefits: "",
   openings: 1, deadline: "", urgency: "Standard" as Urgency,
