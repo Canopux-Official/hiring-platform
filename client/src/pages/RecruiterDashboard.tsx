@@ -1042,12 +1042,6 @@ export default function RecruiterDashboard() {
 
       {/* Profile drawer — calls fetchJobSeekerProfile */}
       <ProfileDrawer userId={profileUserId} onClose={() => setProfileUserId(null)} />
-
-      <ApplicationDetailDrawer
-        applicationId={detailAppId}
-        onClose={() => setDetailAppId(null)}
-        onViewProfile={(id) => { setDetailAppId(null); setSelectedJob(null); setProfileUserId(id); }}
-      />
     </Container>
   );
 }

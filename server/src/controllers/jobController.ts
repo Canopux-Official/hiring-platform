@@ -5,6 +5,7 @@ import Application from "../models/Application";
 import { AppError } from "../utils/AppError";
 import { successResponse, getPagination } from "../utils/helpers";
 import JobSeekerProfile from "../models/JobSeekerProfile";
+import mongoose from "mongoose";
 
 // ─── Create Job (Recruiter) ───────────────────────────────────────────────────
 export const createJob = async (
@@ -269,6 +270,55 @@ export const getRecommendedJobs = async (
         page: currentPage,
         limit: take,
         totalPages: Math.ceil(total / take),
+      })
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
+
+
+// ─── Get Recruiter Stats ──────────────────────────────────────────────────────
+export const getRecruiterStats = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const recruiterId = req.user!._id;
+
+    const [totalJobs, totalApplications, pipeline] = await Promise.all([
+      Job.countDocuments({ postedBy: recruiterId }),
+      Application.countDocuments({ recruiter: recruiterId }),
+      Application.aggregate([
+        { $match: { recruiter: new mongoose.Types.ObjectId(String(recruiterId)) } },
+        { $group: { _id: "$status", count: { $sum: 1 } } },
+      ]),
+    ]);
+
+    console.log("totalJobs:", totalJobs);
+    console.log("totalApplications:", totalApplications);
+    console.log("pipeline:", pipeline);
+    
+    const pipelineMap: Record<string, number> = {
+      pending: 0,
+      reviewed: 0,
+      shortlisted: 0,
+      rejected: 0,
+      hired: 0,
+    };
+    pipeline.forEach(({ _id, count }) => {
+      if (_id in pipelineMap) pipelineMap[_id] = count;
+    });
+
+    res.status(200).json(
+      successResponse("Recruiter stats fetched", {
+        totalJobs,
+        totalApplications,
+        pipeline: pipelineMap,
       })
     );
   } catch (err) {
