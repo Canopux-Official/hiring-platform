@@ -28,6 +28,7 @@ import { alpha } from "@mui/material/styles";
 import { useAuth } from "../lib/auth";
 import { useToast } from "../hooks/useToast";
 import NewJobModal from "../components/NewJobModal";
+import {EditJobModal} from "../components/EditJobModal";
 import {
   fetchMyJobs,
   fetchRecruiterStats,
@@ -100,80 +101,6 @@ function JobRowSkeleton() {
   );
 }
 
-// ─── Slim Edit Modal ──────────────────────────────────────────────────────────
-// Only updates status + title — quick edits from the dashboard context menu.
-// Full re-posting is handled by NewJobModal (create flow).
-
-interface EditJobModalProps {
-  job: IJob | null;
-  onClose: () => void;
-  onSaved: (updated: IJob) => void;
-}
-
-function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
-  const toast = useToast();
-  const [title, setTitle] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (job) { setTitle(job.title); }
-  }, [job]);
-
-  async function handleSave() {
-    if (!job) return;
-    setSaving(true);
-    try {
-      const updated = await updateJob(job._id, { title });
-      toast.success(`"${updated.title}" updated`);
-      onSaved(updated);
-    } catch {
-      toast.error("Failed to update job. Please try again.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <Dialog
-      open={!!job}
-      onClose={onClose}
-      maxWidth="xs"
-      fullWidth
-      PaperProps={{ sx: { bgcolor: "background.paper", backgroundImage: "none" } }}
-    >
-      <DialogTitle>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">Edit job</Typography>
-          <IconButton onClick={onClose} disabled={saving}><CloseIcon /></IconButton>
-        </Stack>
-      </DialogTitle>
-      <Divider />
-      <DialogContent>
-        <Stack spacing={2} sx={{ pt: 1 }}>
-          <TextField
-            label="Job title"
-            fullWidth
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            disabled={saving}
-          />
-
-        </Stack>
-      </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} disabled={saving}>Cancel</Button>
-        <Button
-          variant="contained"
-          onClick={handleSave}
-          disabled={saving || !title.trim()}
-          startIcon={saving ? <CircularProgress size={16} color="inherit" /> : null}
-        >
-          {saving ? "Saving…" : "Save"}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
 
 // ─── Profile Drawer ───────────────────────────────────────────────────────────
 
@@ -1047,9 +974,9 @@ export default function RecruiterDashboard() {
         <MenuItem onClick={() => { if (anchor) setSelectedJob(anchor.job); setAnchor(null); }}>
           View applications
         </MenuItem>
-        {/* <MenuItem onClick={() => { if (anchor) { setEditingJob(anchor.job); setAnchor(null); } }}>
+        <MenuItem onClick={() => { if (anchor) { setEditingJob(anchor.job); setAnchor(null); } }}>
           <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
-        </MenuItem> */}
+        </MenuItem>
         <Divider />
         <MenuItem
           onClick={() => { if (anchor) setDeleteConfirm(anchor.job); setAnchor(null); }}
