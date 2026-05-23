@@ -40,7 +40,7 @@ export const applyToJob = async (
       applicant: req.user!._id,
       recruiter: job.postedBy,
       coverLetter: req.body.coverLetter,
-      resumeUrl: profile? profile.resumeUrl : req.body.resumeUrl,
+      resumeUrl: profile?.resumeUrl || req.body.resumeUrl,
       statusHistory: [
         {
           status: ApplicationStatus.PENDING,
