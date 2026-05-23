@@ -45,12 +45,13 @@ export const createJobSchema = z.object({
 
 export const updateJobSchema = createJobSchema.partial().extend({
   status: z.nativeEnum(JobStatus).optional(),
-  resumeUrl: z.string().url().optional().or(z.literal("")),
+  
 });
 
 // ─── Application ──────────────────────────────────────────────────────────────
 export const applyJobSchema = z.object({
   coverLetter: z.string().max(3000).optional(),
+  resumeUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export const updateApplicationStatusSchema = z.object({
