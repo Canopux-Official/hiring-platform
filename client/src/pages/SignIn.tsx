@@ -24,7 +24,7 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { motion, AnimatePresence } from "framer-motion";
 import { alpha } from "@mui/material/styles";
-import { useAuth, demoCredentials, type Role } from "../lib/auth";
+import { useAuth, type Role } from "../lib/auth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -107,11 +107,6 @@ export default function SignIn() {
     setErr("");
   };
 
-  // Autofill uses the actual role — including admin
-  const autofill = () => {
-    const c = demoCredentials[role];
-    setForm((prev) => ({ ...prev, email: c.email, password: c.password }));
-  };
 
   // ── sign-in submit ─────────────────────────────────────────────────────────
 
@@ -335,9 +330,7 @@ export default function SignIn() {
                   Welcome back
                 </Typography>
                 <Typography color="text.secondary" sx={{ mb: 3 }}>
-                  {role === "admin"
-                    ? "Sign in with your admin credentials."
-                    : "Use the demo credentials or click autofill."}
+                  Sign in with your credentials.
                 </Typography>
 
                 <form onSubmit={handleSignIn}>
@@ -395,15 +388,6 @@ export default function SignIn() {
                       {submitting ? "Signing in…" : "Sign In"}
                     </Button>
 
-                    <Button
-                      onClick={autofill}
-                      variant="outlined"
-                      size="small"
-                      fullWidth
-                      disabled={submitting}
-                    >
-                      Autofill demo credentials
-                    </Button>
 
                     {/* Only show register link for non-admin roles */}
                     {role !== "admin" && (
@@ -430,31 +414,6 @@ export default function SignIn() {
                   </Stack>
                 </form>
 
-                <Box
-                  sx={{
-                    mt: 3,
-                    p: 2,
-                    bgcolor: alpha(
-                      role === "admin" ? "#f472b6" : "#34d39e",
-                      0.06
-                    ),
-                    borderRadius: 2,
-                  }}
-                >
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: "block", mb: 0.5 }}
-                  >
-                    Demo account
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
-                    {demoCredentials[role].email}
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
-                    {demoCredentials[role].password}
-                  </Typography>
-                </Box>
               </Card>
             </motion.div>
           )}

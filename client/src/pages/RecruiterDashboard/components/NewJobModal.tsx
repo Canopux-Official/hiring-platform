@@ -8,8 +8,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { alpha } from "@mui/material/styles";
-import { createJob, CreateJobPayload, JobType, ExperienceLevel } from "../api/recruiter";
-import { useToast } from "../hooks/useToast";
+import { createJob, CreateJobPayload, JobType, ExperienceLevel } from "../services/recruiter";
+import { useToast } from "../../../hooks/useToast";
+
+import { getErrorMessage } from "../../../utils/errorUtils";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -135,12 +137,10 @@ export default function NewJobModal({ open, onClose, onSuccess }: Props) {
       // Reset internal state
       setForm(empty);
       setStep(0);
-      setSkillInput("");
-
       // Notify dashboard — it will show the toast and reload jobs
       onSuccess();
-    } catch {
-      toast.error("Failed to post job. Please check your details and try again.");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Failed to post job. Please check your details and try again."));
     } finally {
       setSubmitting(false);
     }

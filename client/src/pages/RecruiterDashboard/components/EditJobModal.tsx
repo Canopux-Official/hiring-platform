@@ -22,8 +22,10 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect, useState } from "react";
-import { useToast } from "../hooks/useToast"; // adjust path as needed
-import { updateJob, IJob } from "../api/recruiter"; // adjust path as needed
+import { useToast } from "../../../hooks/useToast"; // adjust path as needed
+import { updateJob, IJob } from "../services/recruiter"; // adjust path as needed
+
+import { getErrorMessage } from "../../../utils/errorUtils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -245,8 +247,8 @@ export function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
       const updated = await updateJob(job._id, payload as any);
       toast.success(`"${updated.title}" updated`);
       onSaved(updated);
-    } catch {
-      toast.error("Failed to update job. Please try again.");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Failed to update job. Please try again."));
     } finally {
       setSaving(false);
     }
