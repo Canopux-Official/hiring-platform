@@ -160,6 +160,7 @@ export function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [type, setType] = useState<JobType>("full_time");
+  const [category, setCategory] = useState("");
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>("mid");
   const [status, setStatus] = useState<JobStatus>("open");
   const [openings, setOpenings] = useState<string>("");
@@ -183,6 +184,7 @@ export function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
     setTitle(job.title ?? "");
     setDescription(job.description ?? "");
     setLocation(job.location ?? "");
+    setCategory(job.category ?? "");
     setType((job.type as JobType) ?? "full_time");
     setExperienceLevel((job.experienceLevel as ExperienceLevel) ?? "mid");
     setStatus((job.status as JobStatus) ?? "open");
@@ -222,6 +224,7 @@ export function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
       title: title.trim(),
       description: description.trim(),
       location: location.trim(),
+      category: category.trim() || undefined,
       type,
       experienceLevel,
       status,
@@ -332,7 +335,7 @@ export function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
             </TextField>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={4}>
             <TextField
               select
               label="Job Type"
@@ -349,7 +352,7 @@ export function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
             </TextField>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={4}>
             <TextField
               select
               label="Experience Level"
@@ -362,6 +365,21 @@ export function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
                 <MuiMenuItem key={l.value} value={l.value}>
                   {l.label}
                 </MuiMenuItem>
+              ))}
+            </TextField>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <TextField
+              select
+              label="Category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              fullWidth
+              size="small"
+            >
+              {["Engineering", "Design", "Creative", "Hospitality", "Logistics", "Executive", "Other"].map((c) => (
+                <MuiMenuItem key={c} value={c}>{c}</MuiMenuItem>
               ))}
             </TextField>
           </Grid>

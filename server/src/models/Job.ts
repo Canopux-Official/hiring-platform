@@ -17,6 +17,7 @@ export interface IJob extends Document {
   responsibilities: string[];
   skills: string[];
   company: string;
+  category?: string;
   location: string;
   type: JobType;
   experienceLevel: ExperienceLevel;
@@ -49,6 +50,10 @@ const jobSchema = new Schema<IJob>(
     company: {
       type: String,
       required: [true, "Company name is required"],
+      trim: true,
+    },
+    category: {
+      type: String,
       trim: true,
     },
     location: {

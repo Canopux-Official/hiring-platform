@@ -115,6 +115,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: Props) {
       const payload: CreateJobPayload = {
         title:            form.title,
         company:          form.company,
+        category:         form.category,
         location:         form.location,
         description:      form.description,
         responsibilities: toLines(form.responsibilities),
@@ -325,6 +326,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: Props) {
                 {form.company || "Company"} · {form.location || "Location"}
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
+                <Chip size="small" label={form.category} variant="outlined" color="primary" />
                 <Chip size="small" label={form.employmentType} variant="outlined" />
                 <Chip size="small" label={form.workMode} variant="outlined" />
                 <Chip size="small" label={form.urgency} sx={{ bgcolor: alpha("#34d39e", 0.12), color: "primary.main" }} />

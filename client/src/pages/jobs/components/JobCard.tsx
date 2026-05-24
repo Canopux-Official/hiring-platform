@@ -97,6 +97,7 @@ export default function JobCard({ job, onClick }: JobCardProps) {
             </Stack>
 
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {job.category && <Chip size="small" label={job.category} color="primary" variant="outlined" />}
               <Chip size="small" label={JOB_TYPE_LABELS[job.type]} variant="outlined" />
               <Chip size="small" label={EXP_LABELS[job.experienceLevel]} variant="outlined" />
               {job.skills.slice(0, 3).map((s) => (
