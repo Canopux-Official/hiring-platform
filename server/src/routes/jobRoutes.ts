@@ -6,7 +6,8 @@ import {
   updateJob,
   deleteJob,
   getMyJobs,
-  getRecommendedJobs
+  getRecommendedJobs,
+  getRecruiterStats
 } from "../controllers/jobController";
 import {
   applyToJob,
@@ -47,6 +48,15 @@ router.get(
   authorize(Role.RECRUITER, Role.ADMIN),
   getMyJobs
 );
+
+router.get(
+  "/recruiter/stats",
+  authenticate,
+  authorize(Role.RECRUITER, Role.ADMIN),
+  getRecruiterStats
+);
+
+
 router.get("/:id", getJob);
 router.patch(
   "/:id",

@@ -3,8 +3,10 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { theme } from "./lib/theme";
-import { AuthProvider } from "./lib/auth";
-import { JobsProvider } from "./lib/jobs-store";
+
+import { AuthProvider } from "./pages/signin/lib/auth"; // to be changed
+
+import { JobsProvider } from "../src/pages/jobs/services/job-context"; // to be changed
 import App from "./App";
 import { ToastProvider } from "./hooks/useToast";
 

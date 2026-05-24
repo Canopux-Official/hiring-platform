@@ -3,14 +3,17 @@ import { Box } from "@mui/material";
 import SiteNav from "./components/SiteNav";
 import SiteFooter from "./components/SiteFooter";
 import Home from "./pages/Home";
-import Jobs from "./pages/Jobs";
+
 import Talent from "./pages/Talent";
-import SignIn from "./pages/SignIn";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
-import SeekerDashboard from "./pages/SeekerDashboard";
+
 import AdminDashboard from "./pages/AdminDashboard";
-import { useAuth } from "./lib/auth";
-import type { Role } from "./lib/auth";
+
+import { useAuth } from "./pages/signin/lib/auth"; // to  be changed
+import type { Role } from "./pages/signin/lib/auth"; // to be changed
+import SignIn from "./pages/signin/SignIn";
+import SeekerDashboard from "./pages/seeker/SeekerDashboard";
+import Jobs from "./pages/jobs/Jobs";
 
 // ─── Role-based redirect helper ───────────────────────────────────────────────
 
@@ -50,7 +53,7 @@ export default function App() {
         <Routes>
           {/* Public */}
           <Route path="/" element={<Home />} />
-          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs" element={<Jobs/>} />
           <Route path="/talent" element={<Talent />} />
           <Route path="/signin" element={<SignIn />} />
 

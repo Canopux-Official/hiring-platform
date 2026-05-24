@@ -6,7 +6,7 @@ import {
 import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import HubOutlinedIcon from "@mui/icons-material/HubOutlined";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../pages/signin/lib/auth"; // here need to be changed 
 import { alpha } from "@mui/material/styles";
 
 const links = [
