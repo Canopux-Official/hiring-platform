@@ -36,7 +36,8 @@ export function fmtDate(iso?: string): string {
 // literal object types past what the Record interface accepts.
 export const STATUS_META: Record<
   ApplicationStatus,
-  { label: string; color: "default" | "warning" | "info" | "error" | "success"; icon: React.ReactNode }
+  { label: string; color: "default" | "warning" | "info" | "error" | "success"; icon: React.ReactElement }
+//                                                                                      ^^^^^^^^^^^^^^
 > = {
   pending: {
     label: "Pending",
@@ -78,7 +79,7 @@ export function normalizeProfile(p: IJobSeekerProfile): IJobSeekerProfile {
 
 export function profileCompletion(profile: IJobSeekerProfile | null): number {
   if (!profile) return 0;
-  
+
   const fields: boolean[] = [
     !!profile.headline,
     !!profile.bio,
@@ -90,6 +91,6 @@ export function profileCompletion(profile: IJobSeekerProfile | null): number {
     (profile.preferredLocations || []).length > 0,
     !!profile.linkedIn || !!profile.github || !!profile.portfolio,
   ];
-  
+
   return Math.round((fields.filter(Boolean).length / fields.length) * 100);
 }
