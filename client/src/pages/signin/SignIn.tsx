@@ -8,7 +8,7 @@ import { Box, Container } from "@mui/material";
 import { AnimatePresence } from "framer-motion";
 import { alpha } from "@mui/material/styles";
 
-import { useAuth, demoCredentials } from "./lib/auth";
+import { useAuth } from "./lib/auth";
 import { AuthStep, FormState, Role } from "./types/auth.types";
 import { emptyForm, roleHome, validatePassword } from "./utils/auth.utils";
 import RolePicker from "./components/RolePicker";
@@ -67,10 +67,10 @@ export default function SignIn() {
     setStep("signIn");
   };
 
-  const autofill = () => {
-    const c = demoCredentials[role];
-    setForm((prev) => ({ ...prev, email: c.email, password: c.password }));
-  };
+  // const autofill = () => {
+  //   const c = demoCredentials[role];
+  //   setForm((prev) => ({ ...prev, email: c.email, password: c.password }));
+  // };
 
   // ── Submit handlers ───────────────────────────────────────────────────────
 
@@ -142,7 +142,6 @@ export default function SignIn() {
               onField={onField}
               onSubmit={handleSignIn}
               onGoRegister={goRegister}
-              onAutofill={autofill}
             />
           )}
 

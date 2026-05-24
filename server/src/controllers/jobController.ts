@@ -26,29 +26,35 @@ export const createJob = async (
 };
 
 // ─── Get All Open Jobs (Public / Job Seeker) ──────────────────────────────────
+// ─── Get My Jobs (Recruiter) ──────────────────────────────────────────────────
 export const getJobs = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { page, limit, search, type, experienceLevel, location, skills } =
-      req.query as Record<string, string>;
+    const {
+      page, limit, search, type, experienceLevel,
+      location, skills, category, status, deadlineBefore,
+    } = req.query as Record<string, string>;
 
     const { skip, limit: take, page: currentPage } = getPagination(page, limit);
 
-    const filter: Record<string, unknown> = {
-      status: JobStatus.OPEN,
-    };
+    const filter: Record<string, unknown> = {};
 
-    if (search) {
-      filter.$text = { $search: search };
-    }
+    // Default to OPEN unless a specific status is requested
+    filter.status = status ? status : JobStatus.OPEN;
+
+    if (search) filter.$text = { $search: search };
     if (type) filter.type = type;
     if (experienceLevel) filter.experienceLevel = experienceLevel;
     if (location) filter.location = new RegExp(location, "i");
+    if (category) filter.category = category;
+    if (deadlineBefore) filter.applicationDeadline = { $lte: new Date(deadlineBefore) };
     if (skills) {
-      filter.skills = { $in: skills.split(",").map((s) => s.trim().toLowerCase()) };
+      filter.skills = {
+        $in: skills.split(",").map((s) => s.trim().toLowerCase()),
+      };
     }
 
     const [jobs, total] = await Promise.all([
@@ -302,7 +308,7 @@ export const getRecruiterStats = async (
     console.log("totalJobs:", totalJobs);
     console.log("totalApplications:", totalApplications);
     console.log("pipeline:", pipeline);
-    
+
     const pipelineMap: Record<string, number> = {
       pending: 0,
       reviewed: 0,

@@ -33,18 +33,24 @@ interface PaginatedJobsRaw {
 /** GET /jobs — paginated list with optional filters */
 export async function fetchJobs(filters: JobFilters = {}): Promise<PaginatedJobs> {
   const params: Record<string, string | number> = {};
-  if (filters.search)          params.search          = filters.search;
-  if (filters.type)            params.type            = filters.type;
+  if (filters.search) params.search = filters.search;
+  if (filters.type) params.type = filters.type;
   if (filters.experienceLevel) params.experienceLevel = filters.experienceLevel;
-  if (filters.page)            params.page            = filters.page;
-  if (filters.limit)           params.limit           = filters.limit;
+  if (filters.page) params.page = filters.page;
+  if (filters.limit) params.limit = filters.limit;
+
+  if (filters.category) params.category = filters.category;
+  if (filters.status) params.status = filters.status;
+  if (filters.location) params.location = filters.location;
+  if (filters.skills) params.skills = filters.skills;
+  if (filters.deadlineBefore) params.deadlineBefore = filters.deadlineBefore;
 
   const { data } = await api.get<PaginatedJobsRaw>("/jobs", { params });
 
   return {
-    jobs:       data.data.items      ?? [],
-    total:      data.data.total      ?? 0,
-    page:       data.data.page       ?? 1,
+    jobs: data.data.items ?? [],
+    total: data.data.total ?? 0,
+    page: data.data.page ?? 1,
     totalPages: data.data.totalPages ?? 1,
   };
 }

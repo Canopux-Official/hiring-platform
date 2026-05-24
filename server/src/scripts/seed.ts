@@ -65,7 +65,7 @@ async function seed() {
     for (const u of SEED_USERS) {
       const user = await User.create(u);
       createdUsers.push(user);
-      
+
       if (user.role === Role.JOB_SEEKER) {
         await JobSeekerProfile.create({
           user: user._id,
@@ -91,10 +91,12 @@ async function seed() {
         company: "Acme Corp",
         location: "Remote",
         type: "full_time",
+        category: "Engineering",          // ← added
         experienceLevel: "senior",
         salaryRange: { min: 130000, max: 160000, currency: "USD" },
         description: "We are looking for a Senior Frontend Engineer to lead our core UI architecture using React and TypeScript.",
         requirements: ["5+ years React", "TypeScript", "Performance optimization"],
+        responsibilities: ["Lead UI architecture", "Code reviews", "Mentor juniors"],
         skills: ["React", "TypeScript", "Vite"],
         status: JobStatus.OPEN,
         postedBy: recruiters[0]._id,
@@ -104,10 +106,12 @@ async function seed() {
         company: "Acme Corp",
         location: "New York, NY",
         type: "full_time",
+        category: "Design",               // ← added
         experienceLevel: "mid",
         salaryRange: { min: 90000, max: 120000, currency: "USD" },
         description: "Looking for an awesome product designer.",
         requirements: ["Figma", "UI/UX", "User Research"],
+        responsibilities: ["Design product flows", "Run user research", "Build design system"],
         skills: ["Figma", "Design Systems"],
         status: JobStatus.OPEN,
         postedBy: recruiters[0]._id,
@@ -117,10 +121,12 @@ async function seed() {
         company: "TechFlow",
         location: "Remote",
         type: "contract",
+        category: "Engineering",          // ← added
         experienceLevel: "mid",
         salaryRange: { min: 100000, max: 130000, currency: "USD" },
         description: "Contract role for a backend developer.",
         requirements: ["Node.js", "Express", "MongoDB"],
+        responsibilities: ["Build REST APIs", "Design DB schemas", "Write tests"],
         skills: ["Node.js", "MongoDB", "AWS"],
         status: JobStatus.OPEN,
         postedBy: recruiters[1]._id,
