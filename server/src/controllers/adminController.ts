@@ -5,7 +5,6 @@ import Job from "../models/Job";
 import Application from "../models/Application";
 import { AppError } from "../utils/AppError";
 import { successResponse, getPagination } from "../utils/helpers";
-import mongoose from "mongoose";
 
 // ─── Dashboard Stats ──────────────────────────────────────────────────────────
 export const getDashboardStats = async (
