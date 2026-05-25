@@ -37,8 +37,9 @@ export interface ApiUser {
 }
 
 export interface AuthResponse {
-  token: string;
-  user: ApiUser;
+  token?: string;         // ✅ optional — not returned for pending recruiters
+  user?: ApiUser;         // ✅ optional — not returned for pending recruiters
+  pendingApproval?: boolean; // ✅ new
 }
 
 export interface ApiResult<T> {

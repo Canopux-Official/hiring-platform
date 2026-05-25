@@ -55,6 +55,13 @@ export interface JobFilters {
   type?: JobType | "";
   experienceLevel?: ExperienceLevel | "";
   page?: number;
+
+  category?: string;
+  status?: string;
+  location?: string;
+  skills?: string;        // comma-separated e.g. "react,node.js"
+  deadlineBefore?: string; // ISO date string
+
   limit?: number;
 }
 

@@ -23,15 +23,15 @@ export default function Talent() {
             <Card sx={{ p: 3, height: "100%", transition: "transform 0.3s", "&:hover": { transform: "translateY(-4px)" } }}>
               <CardContent sx={{ p: 0 }}>
                 <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                  <Avatar sx={{ width: 56, height: 56, bgcolor: "primary.main", color: "primary.contrastText", fontWeight: 700 }}>{t.avatar}</Avatar>
+                  <Avatar sx={{ width: 56, height: 56, background: "linear-gradient(135deg, #7c3aed, #a78bfa)", color: "#fff", fontWeight: 700 }}>{t.avatar}</Avatar>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="h6">{t.name}</Typography>
                     <Typography variant="body2" color="text.secondary">{t.role}</Typography>
                   </Box>
-                  <Box sx={{ textAlign: "center", px: 1.5, py: 0.5, bgcolor: alpha("#34d39e", 0.12), borderRadius: 2 }}>
+                  <Box sx={{ textAlign: "center", px: 1.5, py: 0.5, bgcolor: "#ede9fe", borderRadius: 2 }}>
                     <Stack direction="row" alignItems="center" spacing={0.3}>
-                      <StarIcon sx={{ fontSize: 14, color: "primary.main" }} />
-                      <Typography variant="caption" sx={{ color: "primary.main", fontWeight: 700 }}>{t.match}%</Typography>
+                      <StarIcon sx={{ fontSize: 14, color: "#7c3aed" }} />
+                      <Typography variant="caption" sx={{ color: "#7c3aed", fontWeight: 700 }}>{t.match}%</Typography>
                     </Stack>
                   </Box>
                 </Stack>

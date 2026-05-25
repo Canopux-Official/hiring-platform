@@ -4,7 +4,7 @@ import User from "../models/User";
 import JobSeekerProfile from "../models/JobSeekerProfile";
 import Job from "../models/Job";
 import Application from "../models/Application";
-import { Role, JobStatus, ApplicationStatus } from "../types";
+import { Role } from "../types";
 
 dotenv.config();
 
@@ -14,37 +14,49 @@ const SEED_USERS = [
     email: "admin@platform.com",
     password: "Password123!",
     role: Role.ADMIN,
-  },
-  {
-    name: "Acme Corp Recruiter",
-    email: "recruiter1@acme.com",
-    password: "Password123!",
-    role: Role.RECRUITER,
-  },
-  {
-    name: "TechFlow Recruiter",
-    email: "recruiter2@techflow.io",
-    password: "Password123!",
-    role: Role.RECRUITER,
-  },
-  {
-    name: "Alice Software",
-    email: "alice@example.com",
-    password: "Password123!",
-    role: Role.JOB_SEEKER,
-  },
-  {
-    name: "Bob Design",
-    email: "bob@example.com",
-    password: "Password123!",
-    role: Role.JOB_SEEKER,
-  },
-  {
-    name: "Charlie Product",
-    email: "charlie@example.com",
-    password: "Password123!",
-    role: Role.JOB_SEEKER,
-  },
+    isActive: true,
+    approvalStatus: null,
+  }
+  // {
+  //   name: "Acme Corp Recruiter",
+  //   email: "recruiter1@acme.com",
+  //   password: "Password123!",
+  //   role: Role.RECRUITER,
+  //   isActive: true,
+  //   approvalStatus: RecruiterApprovalStatus.APPROVED, // ✅ pre-approved
+  // },
+  // {
+  //   name: "TechFlow Recruiter",
+  //   email: "recruiter2@techflow.io",
+  //   password: "Password123!",
+  //   role: Role.RECRUITER,
+  //   isActive: true,
+  //   approvalStatus: RecruiterApprovalStatus.APPROVED, // ✅ pre-approved
+  // },
+  // {
+  //   name: "Alice Software",
+  //   email: "alice@example.com",
+  //   password: "Password123!",
+  //   role: Role.JOB_SEEKER,
+  //   isActive: true,
+  //   approvalStatus: null,
+  // },
+  // {
+  //   name: "Bob Design",
+  //   email: "bob@example.com",
+  //   password: "Password123!",
+  //   role: Role.JOB_SEEKER,
+  //   isActive: true,
+  //   approvalStatus: null,
+  // },
+  // {
+  //   name: "Charlie Product",
+  //   email: "charlie@example.com",
+  //   password: "Password123!",
+  //   role: Role.JOB_SEEKER,
+  //   isActive: true,
+  //   approvalStatus: null,
+  // },
 ];
 
 async function seed() {
@@ -65,13 +77,13 @@ async function seed() {
     for (const u of SEED_USERS) {
       const user = await User.create(u);
       createdUsers.push(user);
-      
+
       if (user.role === Role.JOB_SEEKER) {
         await JobSeekerProfile.create({
           user: user._id,
           headline: `Headline for ${user.name}`,
           bio: `This is the bio for ${user.name}. Experienced professional looking for new opportunities.`,
-          skills: ["React", "Node.js", "TypeScript", "Figma"],
+          skills: ["react", "node.js", "typescript", "figma"], // ✅ lowercase to match schema
           experience: [],
           education: [],
           expectedSalary: 120000,
@@ -81,92 +93,152 @@ async function seed() {
     }
     console.log(`✅ ${createdUsers.length} Users and JobSeekerProfiles created.`);
 
-    const recruiters = createdUsers.filter(u => u.role === Role.RECRUITER);
-    const seekers = createdUsers.filter(u => u.role === Role.JOB_SEEKER);
+    // const recruiters = createdUsers.filter((u) => u.role === Role.RECRUITER);
+    // const seekers = createdUsers.filter((u) => u.role === Role.JOB_SEEKER);
 
     console.log("🌱 Seeding Jobs...");
-    const jobsToCreate = [
-      {
-        title: "Senior Frontend Engineer",
-        company: "Acme Corp",
-        location: "Remote",
-        type: "full_time",
-        experienceLevel: "senior",
-        salaryRange: { min: 130000, max: 160000, currency: "USD" },
-        description: "We are looking for a Senior Frontend Engineer to lead our core UI architecture using React and TypeScript.",
-        requirements: ["5+ years React", "TypeScript", "Performance optimization"],
-        skills: ["React", "TypeScript", "Vite"],
-        status: JobStatus.OPEN,
-        postedBy: recruiters[0]._id,
-      },
-      {
-        title: "Product Designer",
-        company: "Acme Corp",
-        location: "New York, NY",
-        type: "full_time",
-        experienceLevel: "mid",
-        salaryRange: { min: 90000, max: 120000, currency: "USD" },
-        description: "Looking for an awesome product designer.",
-        requirements: ["Figma", "UI/UX", "User Research"],
-        skills: ["Figma", "Design Systems"],
-        status: JobStatus.OPEN,
-        postedBy: recruiters[0]._id,
-      },
-      {
-        title: "Backend Node.js Developer",
-        company: "TechFlow",
-        location: "Remote",
-        type: "contract",
-        experienceLevel: "mid",
-        salaryRange: { min: 100000, max: 130000, currency: "USD" },
-        description: "Contract role for a backend developer.",
-        requirements: ["Node.js", "Express", "MongoDB"],
-        skills: ["Node.js", "MongoDB", "AWS"],
-        status: JobStatus.OPEN,
-        postedBy: recruiters[1]._id,
-      }
-    ];
+    // const jobsToCreate = [
+    //   {
+    //     title: "Senior Frontend Engineer",
+    //     company: "Acme Corp",
+    //     location: "Remote",
+    //     type: "full_time",
+    //     experienceLevel: "senior",
+    //     salaryRange: { min: 130000, max: 160000, currency: "USD" },
+    //     description:
+    //       "We are looking for a Senior Frontend Engineer to lead our core UI architecture using React and TypeScript.",
+    //     requirements: ["5+ years React", "TypeScript", "Performance optimization"],
+    //     responsibilities: ["Lead UI architecture", "Code reviews", "Mentor juniors"],
+    //     skills: ["react", "typescript", "vite"], // ✅ lowercase to match schema
+    //     status: JobStatus.OPEN,
+    //     postedBy: recruiters[0]._id,
+    //   },
+    //   {
+    //     title: "Product Designer",
+    //     company: "Acme Corp",
+    //     location: "New York, NY",
+    //     type: "full_time",
+    //     experienceLevel: "mid",
+    //     salaryRange: { min: 90000, max: 120000, currency: "USD" },
+    //     description: "Looking for an awesome product designer.",
+    //     requirements: ["Figma", "UI/UX", "User Research"],
+    //     responsibilities: [
+    //       "Design product flows",
+    //       "Run user research",
+    //       "Build design system",
+    //     ],
+    //     skills: ["figma", "design systems"], // ✅ lowercase
+    //     status: JobStatus.OPEN,
+    //     postedBy: recruiters[0]._id,
+    //   },
+    //   {
+    //     title: "Backend Node.js Developer",
+    //     company: "TechFlow",
+    //     location: "Remote",
+    //     type: "contract",
+    //     experienceLevel: "mid",
+    //     salaryRange: { min: 100000, max: 130000, currency: "USD" },
+    //     description: "Contract role for a backend developer.",
+    //     requirements: ["Node.js", "Express", "MongoDB"],
+    //     responsibilities: ["Build REST APIs", "Design DB schemas", "Write tests"],
+    //     skills: ["node.js", "mongodb", "aws"], // ✅ lowercase
+    //     status: JobStatus.OPEN,
+    //     postedBy: recruiters[1]._id,
+    //   },
+    // ];
 
-    const createdJobs = await Job.insertMany(jobsToCreate);
-    console.log(`✅ ${createdJobs.length} Jobs created.`);
+    // const createdJobs = await Job.insertMany(jobsToCreate);
+    // console.log(`✅ ${createdJobs.length} Jobs created.`);
 
-    console.log("🌱 Seeding Applications...");
-    const applicationsToCreate = [
-      {
-        job: createdJobs[0]._id,
-        applicant: seekers[0]._id,
-        recruiter: recruiters[0]._id,
-        status: ApplicationStatus.PENDING,
-        coverLetter: "I'd love to join Acme Corp as a Frontend Engineer!",
-        resumeUrl: "https://example.com/resume-alice.pdf"
-      },
-      {
-        job: createdJobs[0]._id,
-        applicant: seekers[1]._id,
-        recruiter: recruiters[0]._id,
-        status: ApplicationStatus.REVIEWED,
-        coverLetter: "Here is my application for the Frontend role.",
-      },
-      {
-        job: createdJobs[1]._id,
-        applicant: seekers[1]._id,
-        recruiter: recruiters[0]._id,
-        status: ApplicationStatus.SHORTLISTED,
-        coverLetter: "I am a designer applying to Acme Corp.",
-      },
-      {
-        job: createdJobs[2]._id,
-        applicant: seekers[2]._id,
-        recruiter: recruiters[1]._id,
-        status: ApplicationStatus.PENDING,
-        coverLetter: "Applying for the Node.js backend contract.",
-      }
-    ];
+    // console.log("🌱 Seeding Applications...");
+    // const applicationsToCreate = [
+    //   {
+    //     job: createdJobs[0]._id,
+    //     applicant: seekers[0]._id,
+    //     recruiter: recruiters[0]._id,
+    //     status: ApplicationStatus.PENDING,
+    //     coverLetter: "I'd love to join Acme Corp as a Frontend Engineer!",
+    //     resumeUrl: "https://example.com/resume-alice.pdf",
+    //     statusHistory: [
+    //       {
+    //         status: ApplicationStatus.PENDING,
+    //         changedBy: seekers[0]._id,
+    //         note: "Application submitted",
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     job: createdJobs[0]._id,
+    //     applicant: seekers[1]._id,
+    //     recruiter: recruiters[0]._id,
+    //     status: ApplicationStatus.REVIEWED,
+    //     coverLetter: "Here is my application for the Frontend role.",
+    //     statusHistory: [
+    //       {
+    //         status: ApplicationStatus.PENDING,
+    //         changedBy: seekers[1]._id,
+    //         note: "Application submitted",
+    //       },
+    //       {
+    //         status: ApplicationStatus.REVIEWED,
+    //         changedBy: recruiters[0]._id,
+    //         note: "Reviewed by recruiter",
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     job: createdJobs[1]._id,
+    //     applicant: seekers[1]._id,
+    //     recruiter: recruiters[0]._id,
+    //     status: ApplicationStatus.SHORTLISTED,
+    //     coverLetter: "I am a designer applying to Acme Corp.",
+    //     statusHistory: [
+    //       {
+    //         status: ApplicationStatus.PENDING,
+    //         changedBy: seekers[1]._id,
+    //         note: "Application submitted",
+    //       },
+    //       {
+    //         status: ApplicationStatus.SHORTLISTED,
+    //         changedBy: recruiters[0]._id,
+    //         note: "Shortlisted for interview",
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     job: createdJobs[2]._id,
+    //     applicant: seekers[2]._id,
+    //     recruiter: recruiters[1]._id,
+    //     status: ApplicationStatus.PENDING,
+    //     coverLetter: "Applying for the Node.js backend contract.",
+    //     statusHistory: [
+    //       {
+    //         status: ApplicationStatus.PENDING,
+    //         changedBy: seekers[2]._id,
+    //         note: "Application submitted",
+    //       },
+    //     ],
+    //   },
+    // ];
 
-    const createdApps = await Application.insertMany(applicationsToCreate);
-    console.log(`✅ ${createdApps.length} Applications created.`);
+    // await Application.insertMany(applicationsToCreate);
 
-    console.log("\n🎉 Database successfully wiped and seeded!");
+    // // ✅ Update applicationsCount on each job
+    // await Job.findByIdAndUpdate(createdJobs[0]._id, { applicationsCount: 2 });
+    // await Job.findByIdAndUpdate(createdJobs[1]._id, { applicationsCount: 1 });
+    // await Job.findByIdAndUpdate(createdJobs[2]._id, { applicationsCount: 1 });
+
+    // console.log(`✅ ${applicationsToCreate.length} Applications created.`);
+
+    // console.log("\n🎉 Database successfully wiped and seeded!");
+    // console.log("\n📋 Seed credentials:");
+    // console.log("  Admin     → admin@platform.com       / Password123!");
+    // console.log("  Recruiter → recruiter1@acme.com      / Password123!");
+    // console.log("  Recruiter → recruiter2@techflow.io   / Password123!");
+    // console.log("  Seeker    → alice@example.com        / Password123!");
+    // console.log("  Seeker    → bob@example.com          / Password123!");
+    // console.log("  Seeker    → charlie@example.com      / Password123!");
+
     process.exit(0);
   } catch (error) {
     console.error("❌ Seeding failed:", error);

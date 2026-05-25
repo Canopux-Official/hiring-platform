@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Card, Box, Typography, Stack, LinearProgress, Skeleton } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { IAdminDashboardStats } from "../services/admin-api";
@@ -75,7 +75,7 @@ export function PipelineCard({
         { label: "Pending", value: pipeline.pending, color: "#94a3b8" },
         { label: "Reviewed", value: pipeline.reviewed, color: "#fbbf24" },
         { label: "Shortlisted", value: pipeline.shortlisted, color: "#60a5fa" },
-        { label: "Hired", value: pipeline.hired, color: "#34d399" },
+        { label: "Hired", value: pipeline.hired, color: "#10b981" },
         { label: "Rejected", value: pipeline.rejected, color: "#f87171" },
       ]
     : [];
@@ -205,3 +205,4 @@ export function UserRoleCard({
     </Card>
   );
 }
+

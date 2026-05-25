@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -30,7 +30,7 @@ import { createJob, CreateJobPayload } from "../../RecruiterDashboard/services/r
 import { useToast } from "../../../hooks/useToast";
 import { JobType, ExperienceLevel, NewJobFormState, EmploymentType, WorkMode, Urgency } from "../types";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const STEPS = ["Basics", "Details", "Requirements", "Review"];
 
@@ -64,7 +64,7 @@ const EMPTY_FORM: NewJobFormState = {
   urgency: "Standard",
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function inferExperienceLevel(exp: string): ExperienceLevel {
   const s = exp.toLowerCase();
@@ -101,11 +101,11 @@ function inferExperienceLevel(exp: string): ExperienceLevel {
 function toLines(val: string): string[] {
   return val
     .split("\n")
-    .map((l) => l.replace(/^[•\-\*]\s*/, "").trim())
+    .map((l) => l.replace(/^[â€¢\-\*]\s*/, "").trim())
     .filter(Boolean);
 }
 
-// ─── Props ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Props â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface NewJobModalProps {
   open: boolean;
@@ -113,7 +113,7 @@ interface NewJobModalProps {
   onSuccess: () => void;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalProps) {
   const toast = useToast();
@@ -147,15 +147,15 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
       );
       update(
         "responsibilities",
-        "• Lead end-to-end execution\n• Partner with cross-functional teams\n• Mentor and grow the team\n• Drive measurable outcomes"
+        "â€¢ Lead end-to-end execution\nâ€¢ Partner with cross-functional teams\nâ€¢ Mentor and grow the team\nâ€¢ Drive measurable outcomes"
       );
       update(
         "requirements",
-        `• ${form.experience} of relevant experience\n• Strong communication\n• Track record of shipping\n• Comfortable in fast-paced environments`
+        `â€¢ ${form.experience} of relevant experience\nâ€¢ Strong communication\nâ€¢ Track record of shipping\nâ€¢ Comfortable in fast-paced environments`
       );
       update(
         "benefits",
-        "• Competitive salary and equity\n• Flexible remote work\n• Learning budget\n• Premium health cover"
+        "â€¢ Competitive salary and equity\nâ€¢ Flexible remote work\nâ€¢ Learning budget\nâ€¢ Premium health cover"
       );
       setGenerating(false);
     }, 900);
@@ -254,7 +254,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
         <Grid container spacing={4}>
           <Grid item xs={12} md={7}>
 
-            {/* ── Step 0: Basics ──────────────────────────────────────── */}
+            {/* â”€â”€ Step 0: Basics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {step === 0 && (
               <Stack spacing={2}>
                 <TextField
@@ -328,7 +328,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
               </Stack>
             )}
 
-            {/* ── Step 1: Details ─────────────────────────────────────── */}
+            {/* â”€â”€ Step 1: Details â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {step === 1 && (
               <Stack spacing={2}>
                 <Grid container spacing={2}>
@@ -380,7 +380,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
                     onClick={aiGenerate}
                     disabled={generating}
                   >
-                    {generating ? "Generating…" : "AI Assist"}
+                    {generating ? "Generatingâ€¦" : "AI Assist"}
                   </Button>
                 </Stack>
                 <TextField
@@ -410,7 +410,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
               </Stack>
             )}
 
-            {/* ── Step 2: Requirements ────────────────────────────────── */}
+            {/* â”€â”€ Step 2: Requirements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {step === 2 && (
               <Stack spacing={2}>
                 <Box>
@@ -420,7 +420,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
                   <Stack direction="row" spacing={1}>
                     <TextField
                       size="small"
-                      placeholder="Add a skill…"
+                      placeholder="Add a skillâ€¦"
                       value={skillInput}
                       onChange={(e) => setSkillInput(e.target.value)}
                       onKeyDown={(e) => {
@@ -520,14 +520,14 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
               </Stack>
             )}
 
-            {/* ── Step 3: Review ──────────────────────────────────────── */}
+            {/* â”€â”€ Step 3: Review â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {step === 3 && (
               <Stack spacing={1}>
                 <Typography variant="h6">
                   {form.title || "Untitled role"}
                 </Typography>
                 <Typography color="text.secondary">
-                  {form.company} · {form.location} · {form.workMode}
+                  {form.company} Â· {form.location} Â· {form.workMode}
                 </Typography>
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
@@ -549,7 +549,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
             )}
           </Grid>
 
-          {/* ── Live preview ─────────────────────────────────────────────── */}
+          {/* â”€â”€ Live preview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <Grid item xs={12} md={5}>
             <Card sx={{ p: 3, position: "sticky", top: 0 }}>
               <Typography variant="overline" color="primary.main">
@@ -559,7 +559,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
                 {form.title || "Job title"}
               </Typography>
               <Typography color="text.secondary" variant="body2">
-                {form.company || "Company"} · {form.location || "Location"}
+                {form.company || "Company"} Â· {form.location || "Location"}
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
                 <Chip size="small" label={form.category} variant="outlined" color="primary" />
@@ -568,11 +568,11 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
                 <Chip
                   size="small"
                   label={form.urgency}
-                  sx={{ bgcolor: alpha("#34d39e", 0.12), color: "primary.main" }}
+                  sx={{ bgcolor: alpha("#7c3aed", 0.12), color: "primary.main" }}
                 />
               </Stack>
               <Typography variant="h6" sx={{ color: "primary.main", mt: 2 }}>
-                {form.currency} {form.salaryMin / 1000}k – {form.salaryMax / 1000}k
+                {form.currency} {form.salaryMin / 1000}k â€“ {form.salaryMax / 1000}k
               </Typography>
               {form.skills.length > 0 && (
                 <Stack
@@ -626,7 +626,7 @@ export default function NewJobModal({ open, onClose, onSuccess }: NewJobModalPro
               ) : null
             }
           >
-            {submitting ? "Publishing…" : "Publish job"}
+            {submitting ? "Publishingâ€¦" : "Publish job"}
           </Button>
         )}
       </DialogActions>

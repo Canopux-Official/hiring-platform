@@ -1,4 +1,4 @@
-// src/components/seeker/ApplicationsTab.tsx
+﻿// src/components/seeker/ApplicationsTab.tsx
 import { useState } from "react";
 import {
   Box,
@@ -79,9 +79,9 @@ export default function ApplicationsTab({
                 </Stack>
 
                 <Typography variant="body2" color="text.secondary">
-                  {app.job.company} • {app.job.location}
+                  {app.job.company} â€¢ {app.job.location}
                   {(app.job.salaryMin || app.job.salaryMax) && (
-                    <> • {fmtSalary(app.job.salaryMin)}–{fmtSalary(app.job.salaryMax)}</>
+                    <> â€¢ {fmtSalary(app.job.salaryMin)}â€“{fmtSalary(app.job.salaryMax)}</>
                   )}
                 </Typography>
 
@@ -134,7 +134,7 @@ export default function ApplicationsTab({
                 )}
 
                 {app.recruiterNotes && (
-                  <Box sx={{ mt: 2, p: 2, bgcolor: alpha("#34d39e", 0.08), borderLeft: "4px solid", borderColor: "primary.main", borderRadius: 1 }}>
+                  <Box sx={{ mt: 2, p: 2, bgcolor: alpha("#7c3aed", 0.08), borderLeft: "4px solid", borderColor: "primary.main", borderRadius: 1 }}>
                     <Typography variant="caption" color="text.secondary">Recruiter Note:</Typography>
                     <Typography variant="body2">{app.recruiterNotes}</Typography>
                   </Box>

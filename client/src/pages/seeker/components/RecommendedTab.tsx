@@ -1,4 +1,4 @@
-// src/components/seeker/RecommendedTab.tsx
+﻿// src/components/seeker/RecommendedTab.tsx
 import {
   Box,
   Card,
@@ -53,15 +53,15 @@ export default function RecommendedTab({ jobs, loading }: RecommendedTabProps) {
                   <Chip
                     label={`${job.matchScore}% Match`}
                     size="small"
-                    sx={{ bgcolor: alpha("#34d39e", 0.15), color: "#34d39e", fontWeight: 700 }}
+                    sx={{ bgcolor: alpha("#7c3aed", 0.15), color: "#7c3aed", fontWeight: 700 }}
                   />
                 )}
               </Stack>
 
               <Typography variant="body2" color="text.secondary">
-                {job.company} • {job.location}
+                {job.company} â€¢ {job.location}
                 {(job.salaryMin || job.salaryMax) && (
-                  <> • {fmtSalary(job.salaryMin)}–{fmtSalary(job.salaryMax)}</>
+                  <> â€¢ {fmtSalary(job.salaryMin)}â€“{fmtSalary(job.salaryMax)}</>
                 )}
               </Typography>
 

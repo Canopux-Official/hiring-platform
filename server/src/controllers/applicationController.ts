@@ -88,19 +88,27 @@ export const getJobApplications = async (
     const [applications, total] = await Promise.all([
       Application.find(filter)
         .populate("applicant", "name email phone avatar")
-        .populate({
-          path: "applicant",
-          populate: { path: "_id", model: "JobSeekerProfile" },
-        })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(take),
       Application.countDocuments(filter),
     ]);
 
+    // Attach profile to each application result
+    const applicantIds = applications.map((a) => a.applicant._id);
+    const profiles = await JobSeekerProfile.find({ user: { $in: applicantIds } });
+    const profileMap = Object.fromEntries(
+      profiles.map((p) => [p.user.toString(), p])
+    );
+
+    const enriched = applications.map((app) => ({
+      ...app.toObject(),
+      applicantProfile: profileMap[app.applicant._id.toString()] ?? null,
+    }));
+
     res.status(200).json(
       successResponse("Applications fetched", {
-        items: applications,
+        items: enriched, // ✅ was `applications`, now correctly `enriched`
         total,
         page: currentPage,
         limit: take,

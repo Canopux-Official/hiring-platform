@@ -23,11 +23,11 @@ export function fmtDate(iso: string) {
 }
 
 export const ROLE_COLORS: Record<string, string> = {
-  job_seeker: "#60a5fa",
-  recruiter:  "#34d399",
-  admin:      "#f472b6",
-  JOB_SEEKER: "#60a5fa",
-  RECRUITER:  "#34d399",
+  job_seeker: "#0ea5e9",   // Sky blue
+  recruiter:  "#7c3aed",   // Violet primary
+  admin:      "#f472b6",   // Pink — admin-specific accent
+  JOB_SEEKER: "#0ea5e9",
+  RECRUITER:  "#7c3aed",
   ADMIN:      "#f472b6",
 };
 

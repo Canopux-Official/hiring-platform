@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+﻿import React, { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Stack, Box, Typography, IconButton, Divider, Alert, Skeleton, Avatar, FormControl, Select, MenuItem, Tooltip, CircularProgress, Pagination } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
@@ -65,7 +65,7 @@ export function ApplicationsModal({ job, onClose, onViewProfile, onViewApplicati
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Box>
             <Typography variant="h6">{job?.title}</Typography>
-            <Typography variant="caption" color="text.secondary">{job?.company} · {job?.location}</Typography>
+            <Typography variant="caption" color="text.secondary">{job?.company} Â· {job?.location}</Typography>
           </Box>
           <IconButton onClick={onClose}><CloseIcon /></IconButton>
         </Stack>
@@ -100,10 +100,12 @@ export function ApplicationsModal({ job, onClose, onViewProfile, onViewApplicati
         )}
 
         {!loading && (data?.items ?? []).map((app) => {
-          const applicant = typeof app.applicant === "object" ? (app.applicant as IJobSeekerProfile) : null;
+          // âœ… applicant is a User object with name directly on it
+          const applicant = typeof app.applicant === "object" ? app.applicant : null;
+          const profile = app.applicantProfile ?? null;
           const userId = applicant?._id ?? (typeof app.applicant === "string" ? app.applicant : null);
-          const name = applicant?.user?.name ?? "Applicant";
-          const headline = applicant?.headline ?? applicant?.user?.email ?? "";
+          const name = applicant?.name ?? "Applicant";                        // âœ… direct .name
+          const headline = profile?.headline ?? applicant?.email ?? "";
 
           return (
             <Box
@@ -116,7 +118,7 @@ export function ApplicationsModal({ job, onClose, onViewProfile, onViewApplicati
               }}
             >
               <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ sm: "center" }} spacing={2}>
-                <Avatar sx={{ bgcolor: alpha("#34d39e", 0.15), color: "primary.main", fontWeight: 700 }}>
+                <Avatar sx={{ bgcolor: alpha("#7c3aed", 0.15), color: "primary.main", fontWeight: 700 }}>
                   {name[0]}
                 </Avatar>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -178,3 +180,4 @@ export function ApplicationsModal({ job, onClose, onViewProfile, onViewApplicati
     </Dialog>
   );
 }
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Drawer, Stack, Typography, IconButton, Divider, Box, Skeleton, Alert, Avatar, Button, Chip } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -62,7 +62,7 @@ export function ProfileDrawer({ userId, onClose }: ProfileDrawerProps) {
       {profile && (
         <Stack spacing={3}>
           <Stack direction="row" spacing={2} alignItems="center">
-            <Avatar sx={{ width: 56, height: 56, fontSize: 22, bgcolor: alpha("#34d39e", 0.2), color: "primary.main" }}>
+            <Avatar sx={{ width: 56, height: 56, fontSize: 22, bgcolor: alpha("#7c3aed", 0.2), color: "primary.main" }}>
               {profile.user?.name?.[0] ?? "?"}
             </Avatar>
             <Box>
@@ -100,7 +100,7 @@ export function ProfileDrawer({ userId, onClose }: ProfileDrawerProps) {
               <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 1 }}>Skills</Typography>
               <Stack direction="row" flexWrap="wrap" gap={0.5} sx={{ mt: 0.75 }}>
                 {profile.skills.map((s) => (
-                  <Chip key={s} label={s} size="small" sx={{ bgcolor: alpha("#34d39e", 0.1), color: "primary.main" }} />
+                  <Chip key={s} label={s} size="small" sx={{ bgcolor: alpha("#7c3aed", 0.1), color: "primary.main" }} />
                 ))}
               </Stack>
             </Box>
@@ -114,10 +114,10 @@ export function ProfileDrawer({ userId, onClose }: ProfileDrawerProps) {
                   <Box key={exp._id ?? i} sx={{ p: 1.5, borderRadius: 1.5, border: `1px solid ${alpha("#ffffff", 0.07)}` }}>
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>{exp.title}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {exp.company}{exp.location ? ` · ${exp.location}` : ""}
+                      {exp.company}{exp.location ? ` Â· ${exp.location}` : ""}
                     </Typography>
                     <Typography variant="caption" color="text.disabled" display="block">
-                      {new Date(exp.startDate).getFullYear()} – {exp.isCurrent ? "Present" : exp.endDate ? new Date(exp.endDate).getFullYear() : ""}
+                      {new Date(exp.startDate).getFullYear()} â€“ {exp.isCurrent ? "Present" : exp.endDate ? new Date(exp.endDate).getFullYear() : ""}
                     </Typography>
                   </Box>
                 ))}
@@ -134,7 +134,7 @@ export function ProfileDrawer({ userId, onClose }: ProfileDrawerProps) {
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>{edu.degree} in {edu.fieldOfStudy}</Typography>
                     <Typography variant="caption" color="text.secondary">{edu.institution}</Typography>
                     <Typography variant="caption" color="text.disabled" display="block">
-                      {edu.startYear} – {edu.endYear ?? "Present"}{edu.grade ? ` · ${edu.grade}` : ""}
+                      {edu.startYear} â€“ {edu.endYear ?? "Present"}{edu.grade ? ` Â· ${edu.grade}` : ""}
                     </Typography>
                   </Box>
                 ))}
@@ -166,3 +166,4 @@ export function ProfileDrawer({ userId, onClose }: ProfileDrawerProps) {
     </Drawer>
   );
 }
+

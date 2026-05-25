@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import bcrypt from "bcryptjs";
-import { Role } from "../types";
+import { RecruiterApprovalStatus, Role } from "../types";
 
 // Interface.
 export interface IUser extends Document {
@@ -16,6 +16,8 @@ export interface IUser extends Document {
 
   // Methods
   comparePassword(candidatePassword: string): Promise<boolean>;
+
+  approvalStatus?: RecruiterApprovalStatus;    //only relevant for recruiters
 }
 
 
@@ -60,6 +62,11 @@ const userSchema = new Schema<IUser>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    approvalStatus: {
+      type: String,
+      enum: Object.values(RecruiterApprovalStatus),
+      default: null,  // null for non-recruiters
     },
   },
   {

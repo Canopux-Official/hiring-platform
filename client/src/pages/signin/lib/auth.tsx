@@ -15,17 +15,12 @@ export type { Role, User, RegisterPayload };
 
 // ─── Context shape ────────────────────────────────────────────────────────────
 
+// Add pendingApproval to AuthCtx interface
 interface AuthCtx {
   user: User | null;
   loading: boolean;
-  signIn: (
-    email: string,
-    password: string,
-    role: Role
-  ) => Promise<{ ok: boolean; error?: string }>;
-  register: (
-    payload: RegisterPayload
-  ) => Promise<{ ok: boolean; error?: string }>;
+  signIn: (email: string, password: string, role: Role) => Promise<{ ok: boolean; error?: string }>;
+  register: (payload: RegisterPayload) => Promise<{ ok: boolean; error?: string; pendingApproval?: boolean }>; // ✅
   signOut: () => Promise<void>;
 }
 
@@ -82,8 +77,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (payload: RegisterPayload) => {
     const result = await apiRegister(payload);
-    if (!result.ok || !result.data)
-      return { ok: false, error: result.error ?? "Registration failed." };
+    if (!result.ok) return { ok: false, error: result.error ?? "Registration failed." };
+
+    // Recruiter pending approval — no token/user returned, don't set auth state
+    if (result.data?.pendingApproval) {
+      return { ok: true, pendingApproval: true };
+    }
+
+    if (!result.data?.user) return { ok: false, error: "Registration failed." };
+
     const u = toUser(result.data.user);
     setUser(u);
     localStorage.setItem(STORAGE, JSON.stringify(u));
@@ -110,11 +112,11 @@ export function useAuth() {
 }
 
 // Demo credentials kept for autofill convenience
-export const demoCredentials: Record<
-  Role,
-  { email: string; password: string }
-> = {
-  admin: { email: "admin@platform.com", password: "Admin@1234" },
-  recruiter: { email: "recruiter@RagasHire.com", password: "Recruit@123" },
-  job_seeker: { email: "jobseeker@RagasHire.com", password: "seeker@123" },
-};
+// export const demoCredentials: Record<
+//   Role,
+//   { email: string; password: string }
+// > = {
+//   admin: { email: "admin@platform.com", password: "Admin@1234" },
+//   recruiter: { email: "recruiter@RagasHire.com", password: "Recruit@123" },
+//   job_seeker: { email: "jobseeker@RagasHire.com", password: "seeker@123" },
+// };

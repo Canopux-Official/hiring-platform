@@ -24,6 +24,7 @@ export interface IUser {
   role: UserRole;
   phone?: string;
   isActive: boolean;
+  approvalStatus?: "pending" | "approved" | "rejected"; // ✅ new
   createdAt: string;
   updatedAt: string;
 }
@@ -275,4 +276,115 @@ export async function fetchAllApplications(
   }
   const items: IApplication[] = Array.isArray(raw) ? raw : [];
   return { items, total: items.length, page: 1, limit: items.length, totalPages: 1 };
+}
+
+
+
+export interface PendingRecruitersResult {
+  items: IUser[];
+  total: number;
+}
+
+
+
+export async function fetchPendingRecruiters(): Promise<PendingRecruitersResult> {
+  const { data } = await axios.get(`${BASE}/admin/recruiters/pending`, {
+    withCredentials: true,
+  });
+  return data.data;
+}
+
+export async function reviewRecruiter(
+  userId: string,
+  action: "approve" | "reject"
+): Promise<{ approvalStatus: string; isActive: boolean }> {
+  const { data } = await axios.patch(
+    `${BASE}/admin/recruiters/${userId}/review`,
+    { action },
+    { withCredentials: true }
+  );
+  return data.data;
+}
+
+
+
+export interface FetchRecruiterJobsParams {
+  page?: number;
+  limit?: number;
+}
+ 
+export interface RecruiterJobsResult extends Paginated<IJob> {
+  recruiter: Pick<IUser, "_id" | "name" | "email">;
+}
+ 
+export async function fetchRecruiterJobs(
+  recruiterId: string,
+  params: FetchRecruiterJobsParams = {}
+): Promise<RecruiterJobsResult> {
+  const { page = 1, limit = 10 } = params;
+  const { data } = await axios.get(
+    `${BASE}/admin/recruiters/${recruiterId}/jobs`,
+    { params: { page, limit }, withCredentials: true }
+  );
+  return data.data ?? data;
+}
+ 
+export async function adminUpdateJob(
+  recruiterId: string,
+  jobId: string,
+  payload: Partial<Pick<IJob, "title" | "status" | "description" | "location" | "type" | "experienceLevel" | "openings" | "applicationDeadline">>
+): Promise<IJob> {
+  const { data } = await axios.patch(
+    `${BASE}/admin/recruiters/${recruiterId}/jobs/${jobId}`,
+    payload,
+    { withCredentials: true }
+  );
+  return data.data ?? data;
+}
+ 
+export async function adminDeleteJob(
+  recruiterId: string,
+  jobId: string
+): Promise<void> {
+  await axios.delete(
+    `${BASE}/admin/recruiters/${recruiterId}/jobs/${jobId}`,
+    { withCredentials: true }
+  );
+}
+ 
+// ─── Seeker Detail: Applications ─────────────────────────────────────────────
+ 
+export interface FetchSeekerApplicationsParams {
+  page?: number;
+  limit?: number;
+  status?: ApplicationStatus | "";
+}
+ 
+export interface SeekerApplicationsResult extends Paginated<IApplication> {
+  seeker: Pick<IUser, "_id" | "name" | "email">;
+}
+ 
+export async function fetchSeekerApplications(
+  seekerId: string,
+  params: FetchSeekerApplicationsParams = {}
+): Promise<SeekerApplicationsResult> {
+  const { page = 1, limit = 10, status } = params;
+  const query: Record<string, string | number> = { page, limit };
+  if (status) query.status = status;
+ 
+  const { data } = await axios.get(
+    `${BASE}/admin/seekers/${seekerId}/applications`,
+    { params: query, withCredentials: true }
+  );
+  return data.data ?? data;
+}
+ 
+export async function adminDeleteApplication(
+  seekerId: string,
+  applicationId: string
+): Promise<void> {
+  await axios.delete(
+    `${BASE}/admin/seekers/${seekerId}/applications/${applicationId}`,
+    { withCredentials: true }
+  );
 }

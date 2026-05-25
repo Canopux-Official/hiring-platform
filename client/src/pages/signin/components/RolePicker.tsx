@@ -1,4 +1,4 @@
-// components/SignIn/RolePicker.tsx
+﻿// components/SignIn/RolePicker.tsx
 
 import {
   Box,
@@ -47,7 +47,7 @@ const ROLE_ICONS: Record<Role, React.ReactNode> = {
 };
 
 function accentColor(role: Role): string {
-  return role === "admin" ? "#f472b6" : "#34d39e";
+  return role === "admin" ? "#f472b6" : "#7c3aed";
 }
 
 export default function RolePicker({ onPick }: Props) {

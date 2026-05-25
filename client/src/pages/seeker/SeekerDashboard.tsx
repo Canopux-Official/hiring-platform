@@ -118,7 +118,7 @@ export default function SeekerDashboard() {
         <Grid item xs={12} md={3}>
           <Card sx={{ p: 3, mb: 3, textAlign: "center" }}>
             <Avatar
-              sx={{ width: 80, height: 80, mx: "auto", mb: 2, bgcolor: "primary.main", fontSize: 32 }}
+              sx={{ width: 80, height: 80, mx: "auto", mb: 2, background: "linear-gradient(135deg, #7c3aed, #a78bfa)", color: "#fff", fontSize: 32 }}
             >
               {user?.name?.[0]}
             </Avatar>
@@ -129,12 +129,19 @@ export default function SeekerDashboard() {
               </Typography>
             )}
 
-            <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
-              <Box sx={{ position: "relative", width: 110, height: 110 }}>
-                {/* Ring Progress can be added here if needed */}
-                <Typography variant="h4" sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontWeight: 800 }}>
-                  {completion}%
-                </Typography>
+            <Box sx={{ mt: 3, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{
+                  width: 80, height: 80, borderRadius: "50%",
+                  border: "4px solid #ede9fe",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: `conic-gradient(#7c3aed ${completion * 3.6}deg, #ede9fe 0deg)`,
+                  boxShadow: "0 0 0 4px #fff",
+                }}
+              >
+                <Box sx={{ width: 64, height: 64, borderRadius: "50%", bgcolor: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Typography variant="h6" sx={{ fontWeight: 800, color: "#7c3aed", fontSize: 18 }}>{completion}%</Typography>
+                </Box>
               </Box>
             </Box>
             <Typography variant="caption" color="text.secondary">Profile Completion</Typography>

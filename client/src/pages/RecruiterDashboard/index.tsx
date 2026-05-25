@@ -15,7 +15,7 @@ import { alpha } from "@mui/material/styles";
 import { useAuth } from "../../pages/signin/lib/auth";
 import { useToast } from "../../hooks/useToast";
 import NewJobModal from "./components/NewJobModal";
-import { EditJobModal } from "./components/EditJobModal";
+ 
 import {
   fetchMyJobs,
   fetchRecruiterStats,
@@ -31,6 +31,7 @@ import { ApplicationDetailDrawer } from "./components/ApplicationDetailDrawer";
 import { ApplicationsModal } from "./components/ApplicationsModal";
 
 import { getErrorMessage } from "../../utils/errorUtils";
+import { EditJobModal } from "./components/EditJobModal";
 
 export default function RecruiterDashboard() {
   const { user } = useAuth();
@@ -157,7 +158,7 @@ export default function RecruiterDashboard() {
           : statCards.map((s) => (
             <Grid item xs={6} md={3} key={s.label}>
               <Card sx={{ p: 3 }}>
-                <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: alpha("#34d39e", 0.12), color: "primary.main", width: "fit-content", mb: 1.5 }}>
+                <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: "#ede9fe", color: "primary.main", width: "fit-content", mb: 1.5 }}>
                   {s.icon}
                 </Box>
                 <Typography variant="h4" sx={{ fontWeight: 800 }}>{s.value}</Typography>
@@ -185,13 +186,13 @@ export default function RecruiterDashboard() {
                     key={job._id}
                     sx={{
                       p: 2, borderRadius: 2,
-                      border: `1px solid ${alpha("#ffffff", 0.06)}`,
+                      border: "1px solid #e5e7eb",
                       display: "flex", alignItems: "center", gap: 2,
-                      "&:hover": { borderColor: alpha("#34d39e", 0.4) },
-                      transition: "border-color .15s",
+                      "&:hover": { borderColor: alpha("#7c3aed", 0.4), bgcolor: "#faf5ff" },
+                      transition: "all .15s",
                     }}
                   >
-                    <Avatar sx={{ bgcolor: alpha("#34d39e", 0.12), color: "primary.main", fontWeight: 700 }}>
+                    <Avatar sx={{ background: "linear-gradient(135deg, #7c3aed, #a78bfa)", color: "#fff", fontWeight: 700 }}>
                       {job.title[0]}
                     </Avatar>
 
@@ -203,9 +204,10 @@ export default function RecruiterDashboard() {
                           label={job.status}
                           sx={{
                             textTransform: "capitalize",
-                            bgcolor: job.status === "open" ? alpha("#34d39e", 0.15) : alpha("#ffffff", 0.08),
-                            color: job.status === "open" ? "primary.main" : "text.secondary",
+                            bgcolor: job.status === "open" ? "#d1fae5" : job.status === "draft" ? "#fef3c7" : "#f3f4f6",
+                            color: job.status === "open" ? "#059669" : job.status === "draft" ? "#d97706" : "#6b7280",
                             fontWeight: 600,
+                            border: "none",
                           }}
                         />
                       </Stack>

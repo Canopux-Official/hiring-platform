@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Drawer, Stack, Typography, IconButton, Divider, Box, Skeleton, Alert, Avatar, Chip, Tooltip, Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PersonIcon from "@mui/icons-material/Person";
@@ -33,11 +33,11 @@ export function ApplicationDetailDrawer({ applicationId, onClose, onViewProfile 
       .finally(() => setLoading(false));
   }, [applicationId]);
 
-  const applicant = app && typeof app.applicant === "object"
-    ? (app.applicant as IJobSeekerProfile)
-    : null;
+  // applicant is a User object, profile is separate
+  const applicant = app && typeof app.applicant === "object" ? app.applicant : null;
+  const profile = app?.applicantProfile ?? null;
   const userId = applicant?._id ?? (typeof app?.applicant === "string" ? app.applicant : null);
-  const name = applicant?.user?.name ?? "Applicant";
+  const name = applicant?.name ?? "Applicant";   
 
   const STATUS_COLOR: Record<string, "default" | "warning" | "info" | "error" | "success"> = {
     pending: "default",
@@ -76,13 +76,13 @@ export function ApplicationDetailDrawer({ applicationId, onClose, onViewProfile 
         {app && (
           <Stack spacing={3}>
             <Stack direction="row" spacing={2} alignItems="center">
-              <Avatar sx={{ width: 48, height: 48, bgcolor: alpha("#34d39e", 0.2), color: "primary.main", fontWeight: 700, fontSize: 18 }}>
+              <Avatar sx={{ width: 48, height: 48, bgcolor: alpha("#7c3aed", 0.2), color: "primary.main", fontWeight: 700, fontSize: 18 }}>
                 {name[0]}
               </Avatar>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography variant="body1" sx={{ fontWeight: 700 }}>{name}</Typography>
-                {applicant?.headline && (
-                  <Typography variant="caption" color="text.secondary" noWrap>{applicant.headline}</Typography>
+                {profile?.headline && (
+                  <Typography variant="caption" color="text.secondary" noWrap>{profile.headline}</Typography>
                 )}
                 <Typography variant="caption" color="text.disabled" display="block">
                   Applied {timeAgo(app.createdAt)}
@@ -146,7 +146,7 @@ export function ApplicationDetailDrawer({ applicationId, onClose, onViewProfile 
                 <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 1 }}>
                   Recruiter Notes
                 </Typography>
-                <Box sx={{ p: 2, mt: 0.75, borderRadius: 1.5, border: `1px solid ${alpha("#34d39e", 0.15)}`, bgcolor: alpha("#34d39e", 0.04) }}>
+                <Box sx={{ p: 2, mt: 0.75, borderRadius: 1.5, border: `1px solid ${alpha("#7c3aed", 0.15)}`, bgcolor: alpha("#7c3aed", 0.04) }}>
                   <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>{app.recruiterNotes}</Typography>
                 </Box>
               </Box>
@@ -203,3 +203,4 @@ export function ApplicationDetailDrawer({ applicationId, onClose, onViewProfile 
     </Drawer>
   );
 }
+

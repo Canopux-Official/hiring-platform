@@ -78,12 +78,17 @@ export default function Jobs() {
     <Container maxWidth="lg" sx={{ py: { xs: 5, md: 8 } }}>
       {/* Hero */}
       <Typography
+        sx={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7c3aed", mb: 1 }}
+      >
+        Global Opportunities
+      </Typography>
+      <Typography
         variant="h2"
-        sx={{ fontSize: { xs: 32, md: 48 }, mb: 1, fontWeight: 700, color: "text.primary" }}
+        sx={{ fontSize: { xs: 32, md: 48 }, mb: 1, fontWeight: 800, color: "text.primary", letterSpacing: "-0.025em" }}
       >
         Find your next role
       </Typography>
-      <Typography color="text.secondary" sx={{ mb: 5 }}>
+      <Typography color="text.secondary" sx={{ mb: 5, fontSize: 16.5 }}>
         {loading
           ? "Loading opportunities..."
           : `${total} curated openings across the globe.`}
