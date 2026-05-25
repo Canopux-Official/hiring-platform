@@ -24,6 +24,7 @@ export interface IUser {
   role: UserRole;
   phone?: string;
   isActive: boolean;
+  approvalStatus?: "pending" | "approved" | "rejected"; // ✅ new
   createdAt: string;
   updatedAt: string;
 }
@@ -275,4 +276,32 @@ export async function fetchAllApplications(
   }
   const items: IApplication[] = Array.isArray(raw) ? raw : [];
   return { items, total: items.length, page: 1, limit: items.length, totalPages: 1 };
+}
+
+
+
+export interface PendingRecruitersResult {
+  items: IUser[];
+  total: number;
+}
+
+
+
+export async function fetchPendingRecruiters(): Promise<PendingRecruitersResult> {
+  const { data } = await axios.get(`${BASE}/admin/recruiters/pending`, {
+    withCredentials: true,
+  });
+  return data.data;
+}
+
+export async function reviewRecruiter(
+  userId: string,
+  action: "approve" | "reject"
+): Promise<{ approvalStatus: string; isActive: boolean }> {
+  const { data } = await axios.patch(
+    `${BASE}/admin/recruiters/${userId}/review`,
+    { action },
+    { withCredentials: true }
+  );
+  return data.data;
 }

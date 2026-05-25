@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "../types";
+import { AuthenticatedRequest, RecruiterApprovalStatus } from "../types";
 import User from "../models/User";
 import JobSeekerProfile from "../models/JobSeekerProfile";
 import { AppError } from "../utils/AppError";
@@ -23,21 +23,41 @@ export const register = async (
       return next(new AppError("Email already registered.", 409));
     }
 
-    const user = await User.create({ name, email, password, role, phone });
+    // ✅ Recruiters start as inactive + pending approval
+    const isRecruiter = role === "recruiter";
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role,
+      phone,
+      isActive: !isRecruiter,                                          // inactive until approved
+      approvalStatus: isRecruiter
+        ? RecruiterApprovalStatus.PENDING
+        : null,
+    });
 
     // Auto-create empty profile for job seekers
     if (user.role === "job_seeker") {
       await JobSeekerProfile.create({ user: user._id });
     }
 
+    // Recruiters get a pending response — no token issued
+    if (isRecruiter) {
+      res.status(201).json(
+        successResponse(
+          "Registration successful. Your account is pending admin approval. You will be able to login once approved.",
+          { pendingApproval: true }
+        )
+      );
+      return;
+    }
+
     const token = generateToken(user._id, user.role, user.email);
     sendTokenCookie(res, token);
 
     res.status(201).json(
-      successResponse("Registration successful", {
-        token,
-        user,
-      })
+      successResponse("Registration successful", { token, user })
     );
   } catch (err) {
     next(err);
@@ -53,14 +73,33 @@ export const login = async (
   try {
     const { email, password, role } = req.body;
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select("+password +approvalStatus");
     if (!user || !(await user.comparePassword(password))) {
       return next(new AppError("Invalid email or password.", 401));
     }
 
-
     if (role && user.role !== role) {
       return next(new AppError("Invalid email or password.", 401));
+    }
+
+    // Block pending recruiters
+    if (
+      user.role === "recruiter" &&
+      user.approvalStatus === RecruiterApprovalStatus.PENDING
+    ) {
+      return next(
+        new AppError("Your account is pending admin approval.", 403)
+      );
+    }
+
+    // Block rejected recruiters
+    if (
+      user.role === "recruiter" &&
+      user.approvalStatus === RecruiterApprovalStatus.REJECTED
+    ) {
+      return next(
+        new AppError("Your recruiter application was rejected. Contact support.", 403)
+      );
     }
 
     if (!user.isActive) {
@@ -70,9 +109,7 @@ export const login = async (
     const token = generateToken(user._id, user.role, user.email);
     sendTokenCookie(res, token);
 
-    // Remove password from response
     const userObj = user.toJSON();
-
     res.status(200).json(successResponse("Login successful", { token, user: userObj }));
   } catch (err) {
     next(err);

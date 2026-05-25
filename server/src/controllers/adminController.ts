@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "../types";
+import { AuthenticatedRequest, RecruiterApprovalStatus, Role } from "../types";
 import User from "../models/User";
 import Job from "../models/Job";
 import Application from "../models/Application";
@@ -163,6 +163,76 @@ export const deleteUser = async (
     if (!user) return next(new AppError("User not found.", 404));
 
     res.status(200).json(successResponse("User deleted successfully"));
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
+// ─── Get Pending Recruiters ───────────────────────────────────────────────────
+export const getPendingRecruiters = async (
+  _req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const pendingRecruiters = await User.find({
+      role: Role.RECRUITER,
+      approvalStatus: RecruiterApprovalStatus.PENDING,
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json(
+      successResponse("Pending recruiters fetched", {
+        items: pendingRecruiters,
+        total: pendingRecruiters.length,
+      })
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Approve or Reject Recruiter ──────────────────────────────────────────────
+export const reviewRecruiter = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { action } = req.body; // "approve" | "reject"
+
+    if (!["approve", "reject"].includes(action)) {
+      return next(new AppError("Action must be 'approve' or 'reject'.", 400));
+    }
+
+    const user = await User.findOne({
+      _id: req.params.id,
+      role: Role.RECRUITER,
+    });
+
+    if (!user) return next(new AppError("Recruiter not found.", 404));
+
+    if (user.approvalStatus !== RecruiterApprovalStatus.PENDING) {
+      return next(new AppError("This recruiter has already been reviewed.", 400));
+    }
+
+    if (action === "approve") {
+      user.approvalStatus = RecruiterApprovalStatus.APPROVED;
+      user.isActive = true;             // activate account on approval
+    } else {
+      user.approvalStatus = RecruiterApprovalStatus.REJECTED;
+      user.isActive = false;            // keep inactive on rejection
+    }
+
+    await user.save();
+
+    res.status(200).json(
+      successResponse(
+        `Recruiter ${action === "approve" ? "approved" : "rejected"} successfully`,
+        { approvalStatus: user.approvalStatus, isActive: user.isActive }
+      )
+    );
   } catch (err) {
     next(err);
   }

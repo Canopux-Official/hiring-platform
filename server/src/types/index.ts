@@ -64,3 +64,9 @@ export interface PaginatedResult<T> {
   limit: number;
   totalPages: number;
 }
+
+export enum RecruiterApprovalStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+}
