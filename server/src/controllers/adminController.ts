@@ -5,6 +5,7 @@ import Job from "../models/Job";
 import Application from "../models/Application";
 import { AppError } from "../utils/AppError";
 import { successResponse, getPagination } from "../utils/helpers";
+import mongoose from "mongoose";
 
 // ─── Dashboard Stats ──────────────────────────────────────────────────────────
 export const getDashboardStats = async (
@@ -233,6 +234,167 @@ export const reviewRecruiter = async (
         { approvalStatus: user.approvalStatus, isActive: user.isActive }
       )
     );
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
+// ─── Get All Jobs by a Recruiter (Admin) ──────────────────────────────────────
+export const getRecruiterJobs = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { recruiterId } = req.params;
+
+    const recruiter = await User.findOne({
+      _id: recruiterId,
+      role: Role.RECRUITER,
+    });
+    if (!recruiter) return next(new AppError("Recruiter not found.", 404));
+
+    const { page, limit } = req.query as Record<string, string>;
+    const { skip, limit: take, page: currentPage } = getPagination(page, limit);
+
+    const [jobs, total] = await Promise.all([
+      Job.find({ postedBy: recruiterId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(take),
+      Job.countDocuments({ postedBy: recruiterId }),
+    ]);
+
+    res.status(200).json(
+      successResponse("Recruiter jobs fetched", {
+        recruiter: { _id: recruiter._id, name: recruiter.name, email: recruiter.email },
+        items: jobs,
+        total,
+        page: currentPage,
+        limit: take,
+        totalPages: Math.ceil(total / take),
+      })
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Edit a Job Posted by a Recruiter (Admin) ─────────────────────────────────
+export const adminUpdateJob = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { recruiterId, jobId } = req.params;
+
+    const job = await Job.findOne({ _id: jobId, postedBy: recruiterId });
+    if (!job) return next(new AppError("Job not found for this recruiter.", 404));
+
+    const updated = await Job.findByIdAndUpdate(jobId, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json(successResponse("Job updated by admin", updated));
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Delete a Job Posted by a Recruiter (Admin) ───────────────────────────────
+export const adminDeleteJob = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { recruiterId, jobId } = req.params;
+
+    const job = await Job.findOne({ _id: jobId, postedBy: recruiterId });
+    if (!job) return next(new AppError("Job not found for this recruiter.", 404));
+
+    await Promise.all([
+      Job.findByIdAndDelete(jobId),
+      Application.deleteMany({ job: jobId }),
+    ]);
+
+    res.status(200).json(successResponse("Job and its applications deleted by admin"));
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Get All Applications by a Job Seeker (Admin) ─────────────────────────────
+export const getSeekerApplications = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { seekerId } = req.params;
+
+    const seeker = await User.findOne({
+      _id: seekerId,
+      role: Role.JOB_SEEKER,
+    });
+    if (!seeker) return next(new AppError("Job seeker not found.", 404));
+
+    const { page, limit, status } = req.query as Record<string, string>;
+    const { skip, limit: take, page: currentPage } = getPagination(page, limit);
+
+    const filter: Record<string, unknown> = { applicant: seekerId };
+    if (status) filter.status = status;
+
+    const [applications, total] = await Promise.all([
+      Application.find(filter)
+        .populate("job", "title company location type status")
+        .populate("recruiter", "name email")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(take),
+      Application.countDocuments(filter),
+    ]);
+
+    res.status(200).json(
+      successResponse("Seeker applications fetched", {
+        seeker: { _id: seeker._id, name: seeker.name, email: seeker.email },
+        items: applications,
+        total,
+        page: currentPage,
+        limit: take,
+        totalPages: Math.ceil(total / take),
+      })
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Delete/Withdraw an Application (Admin) ───────────────────────────────────
+export const adminDeleteApplication = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { seekerId, applicationId } = req.params;
+
+    const application = await Application.findOne({
+      _id: applicationId,
+      applicant: seekerId,
+    });
+    if (!application) return next(new AppError("Application not found for this seeker.", 404));
+
+    await Promise.all([
+      application.deleteOne(),
+      Job.findByIdAndUpdate(application.job, { $inc: { applicationsCount: -1 } }),
+    ]);
+
+    res.status(200).json(successResponse("Application deleted by admin"));
   } catch (err) {
     next(err);
   }
