@@ -545,8 +545,7 @@ export default function RegisterForm({
     if (Object.keys(errors).length > 0) { setFieldErrors(errors); return; }
     setFieldErrors({});
     const result = await onSubmit(e);
-    // ✅ If recruiter pending approval, show waiting screen
-    if (result?.pendingApproval) {
+    if (result && typeof result === "object" && result.pendingApproval) {
       setPendingApproval(true);
     }
   };
