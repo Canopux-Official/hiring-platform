@@ -13,49 +13,102 @@ import {
 import { alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
 
-// Icons
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
 import StarBorderRoundedIcon from "@mui/icons-material/StarBorderRounded";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import TwitterIcon from "@mui/icons-material/Twitter";
 
-const foundersData = {
-  founders: [
-    {
-      name: "Alexandra Mercer",
-      title: "Founder",
-      initials: "AM",
-      accentColor: "#059669",
-      accentBg: "#d1fae5",
-      bio: "Serial entrepreneur with 15+ years shaping the future of sustainable technology. Alexandra has led cross-functional teams across three continents and been recognised by Forbes 30 Under 30. She believes technology should empower people, not replace them.",
-      tags: ["Product Vision", "Venture Capital", "AI/ML", "Strategy"],
-      highlights: [
-        "Forbes 30 Under 30 — Technology (2019)",
-        "Led Series B raise of $28M from Sequoia & a16z",
-        "Previously VP Product at Stripe",
-      ],
-      contact: {
-        email: "ragasworld1@gmail.com",
-        phone: "+91 6299209560"
-      },
-      socials: [
-        { platform: "linkedin", url: "https://linkedin.com/in/alexandramer" },
-        { platform: "twitter", url: "https://twitter.com/alexandramer" },
-      ],
-    },
+const founderData = {
+  name: "Ragas S",
+  title: "Founder",
+  subtitle: "Global Talent Acquisition Leader · International Recruitment Specialist · Campus & Corporate Hiring Expert",
+  initials: "AM",
+  accentColor: "#059669",
+  accentBg: "#d1fae5",
+  bio: "Highly experienced HR & Talent Acquisition Professional with 18+ years of expertise in international and domestic hiring across multiple industries and global markets. Specialised in large-scale recruitment operations, strategic workforce planning, campus hiring, executive search, and multinational recruitment partnerships. Successfully managed hiring projects for MNCs, corporate organisations, startups, and international clients — delivering high-quality talent acquisition solutions with strong industry knowledge and professional recruitment strategies.",
+  tags: [
+    "International Recruitment",
+    "Campus Hiring",
+    "Executive Search",
+    "Bulk & Volume Hiring",
+    "Workforce Planning",
+    "End-to-End Recruitment",
+    "LinkedIn Sourcing",
+    "Remote Hiring",
+    "Recruitment Consulting",
+    "MNC Partnerships",
+    "Talent Strategy",
+    "HR Operations",
+  ],
+  stats: [
+    { num: "18+", label: "Years experience" },
+    { num: "1000s", label: "Placements globally" },
+    { num: "8+", label: "Industries served" },
+    { num: "Global", label: "Reach & network" },
+  ],
+  highlights: [
+    "Successfully handled thousands of candidate placements across global markets",
+    "Extensive international hiring experience across multiple countries and multinational companies",
+    "Led campus placement drives for freshers, graduate hiring programmes, and university recruitment",
+    "Expert in IT, Engineering, Finance, HR, Aviation, Healthcare, and Operations sector hiring",
+    "Built long-term professional relationships with clients, colleges, and recruitment partners worldwide",
+  ],
+  industries: [
+    "Information Technology (IT)",
+    "Engineering & Manufacturing",
+    "Finance & Banking",
+    "Human Resources (HR)",
+    "Aviation & Hospitality",
+    "Healthcare & Pharma",
+    "BPO & Customer Support",
+    "Sales, Marketing & Operations",
+  ],
+  whyConnect: [
+    "18+ Years of Recruitment Excellence",
+    "Strong International Hiring Experience",
+    "Trusted MNC & Corporate Recruitment Partner",
+    "Large Professional Talent Network",
+    "Fast & Quality Hiring Solutions",
+    "Skilled in High-Volume & Executive Hiring",
+    "Professional Candidate Screening & Coordination",
+    "Dedicated Support for Employers & Candidates",
+  ],
+  contact: {
+    email: "ragasworld1@gmail.com",
+    phone: "+91 6299209560",
+  },
+  socials: [
+    { platform: "linkedin", url: "https://www.linkedin.com/in/rohan-singh-5919a83b5?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" }
   ],
 };
 
-// ── Design Tokens ─────────────────────────────────────────────────────
 const GREEN = "#059669";
 const GREEN_DARK = "#047857";
 const GREEN_LIGHT = "#d1fae5";
-const BLUE = "#2563eb";
-const BLUE_LIGHT = "#dbeafe";
 
-// FounderCard Component
-function FounderCard({ founder, delay }: { founder: any; delay: number }) {
+function StatCard({ num, label }: { num: string; label: string }) {
+  return (
+    <Box
+      sx={{
+        bgcolor: "#f8fafc",
+        borderRadius: 3,
+        p: 2.5,
+        textAlign: "center",
+        border: "1px solid #e2e8f0",
+      }}
+    >
+      <Typography sx={{ fontSize: 24, fontWeight: 800, color: "#0f172a" }}>{num}</Typography>
+      <Typography sx={{ fontSize: 13, color: "#64748b", mt: 0.5 }}>{label}</Typography>
+    </Box>
+  );
+}
+
+export default function AboutPage() {
   const [copied, setCopied] = React.useState<string | null>(null);
+  const founder = founderData;
 
   const copy = (val: string, key: string) => {
     navigator.clipboard.writeText(val);
@@ -63,156 +116,6 @@ function FounderCard({ founder, delay }: { founder: any; delay: number }) {
     setTimeout(() => setCopied(null), 1800);
   };
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay }}
-    >
-      <Box
-        sx={{
-          bgcolor: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: 4,
-          p: { xs: 4, md: 6 },
-          boxShadow: "0 4px 20px rgba(15,23,42,0.06)",
-          maxWidth: 680,
-          mx: "auto",
-          transition: "all 0.3s ease",
-          "&:hover": {
-            borderColor: alpha(founder.accentColor, 0.5),
-            boxShadow: `0 15px 40px ${alpha(founder.accentColor, 0.15)}`,
-            transform: "translateY(-6px)",
-          },
-        }}
-      >
-        <Stack direction="row" spacing={3} alignItems="flex-start" mb={4}>
-          <Avatar
-            sx={{
-              width: 88,
-              height: 88,
-              bgcolor: founder.accentBg,
-              color: founder.accentColor,
-              fontWeight: 800,
-              fontSize: "1.8rem",
-              border: `4px solid ${alpha(founder.accentColor, 0.25)}`,
-            }}
-          >
-            {founder.initials}
-          </Avatar>
-
-          <Box flex={1}>
-            <Typography sx={{ fontWeight: 800, fontSize: 24, color: "#0f172a" }}>
-              {founder.name}
-            </Typography>
-            <Typography sx={{ color: founder.accentColor, fontWeight: 600, fontSize: 15 }}>
-              {founder.title}
-            </Typography>
-          </Box>
-        </Stack>
-
-        <Typography sx={{ color: "#475569", lineHeight: 1.75, mb: 4, fontSize: 16.5 }}>
-          {founder.bio}
-        </Typography>
-
-        <Stack direction="row" flexWrap="wrap" gap={1} mb={4}>
-          {founder.tags.map((t: string) => (
-            <Chip
-              key={t}
-              label={t}
-              size="small"
-              sx={{
-                bgcolor: founder.accentBg,
-                color: founder.accentColor,
-                fontWeight: 600,
-                fontSize: 13,
-              }}
-            />
-          ))}
-        </Stack>
-
-        <Box mb={4}>
-          <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", mb: 2 }}>
-            KEY HIGHLIGHTS
-          </Typography>
-          <Stack spacing={1.5}>
-            {founder.highlights.map((h: string, i: number) => (
-              <Stack key={i} direction="row" spacing={1.5} alignItems="flex-start">
-                <StarBorderRoundedIcon sx={{ color: founder.accentColor, fontSize: 18, mt: "3px" }} />
-                <Typography sx={{ fontSize: 15, color: "#1e2937" }}>{h}</Typography>
-              </Stack>
-            ))}
-          </Stack>
-        </Box>
-
-        <Divider sx={{ my: 4 }} />
-
-        <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", mb: 2 }}>
-          CONTACT
-        </Typography>
-
-        <Stack spacing={2.5}>
-          {/* Email */}
-          <Tooltip title={copied === "email" ? "Copied!" : "Copy Email"} placement="top">
-            <Stack
-              direction="row"
-              spacing={2.5}
-              alignItems="center"
-              onClick={() => copy(founder.contact.email, "email")}
-              sx={{
-                p: 2.5,
-                borderRadius: 3,
-                border: `1px solid ${alpha(GREEN, 0.3)}`,
-                cursor: "pointer",
-                bgcolor: "#fff",
-                color: "#1e2937", // Darker text for visibility
-                "&:hover": {
-                  bgcolor: GREEN_LIGHT,
-                  borderColor: GREEN,
-                },
-              }}
-            >
-              <EmailOutlinedIcon sx={{ color: GREEN, fontSize: 24 }} />
-              <Typography sx={{ fontSize: 15.5, fontWeight: 500 }}>
-                {founder.contact.email}
-              </Typography>
-            </Stack>
-          </Tooltip>
-
-          {/* Phone */}
-          <Tooltip title={copied === "phone" ? "Copied!" : "Copy Phone"} placement="top">
-            <Stack
-              direction="row"
-              spacing={2.5}
-              alignItems="center"
-              onClick={() => copy(founder.contact.phone, "phone")}
-              sx={{
-                p: 2.5,
-                borderRadius: 3,
-                border: `1px solid ${alpha(BLUE, 0.3)}`,
-                cursor: "pointer",
-                bgcolor: "#fff",
-                color: "#1e2937", // Darker text for visibility
-                "&:hover": {
-                  bgcolor: BLUE_LIGHT,
-                  borderColor: BLUE,
-                },
-              }}
-            >
-              <PhoneOutlinedIcon sx={{ color: BLUE, fontSize: 24 }} />
-              <Typography sx={{ fontSize: 15.5, fontWeight: 500 }}>
-                {founder.contact.phone}
-              </Typography>
-            </Stack>
-          </Tooltip>
-        </Stack>
-      </Box>
-    </motion.div>
-  );
-}
-
-// ── Main About Page ─────────────────────────────────────────────────────
-export default function AboutPage() {
   return (
     <Box sx={{ bgcolor: "#ffffff", position: "relative", overflow: "hidden" }}>
       {/* Background Glow */}
@@ -230,88 +133,308 @@ export default function AboutPage() {
         }}
       />
 
-      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1, pt: { xs: 12, md: 16 }, pb: { xs: 10, md: 16 } }}>
-        {/* Hero Section */}
-        <Box textAlign="center" mb={{ xs: 10, md: 14 }}>
-          <Chip
-            icon={<AutoAwesomeIcon sx={{ fontSize: 15, color: GREEN }} />}
-            label="OUR STORY"
-            sx={{
-              mb: 3,
-              px: 2,
-              py: 1,
-              fontSize: 13,
-              fontWeight: 700,
-              bgcolor: GREEN_LIGHT,
-              color: GREEN,
-              border: `1px solid ${alpha(GREEN, 0.3)}`,
-            }}
-          />
-
-          <Typography
-            variant="h1"
-            sx={{
-              fontSize: { xs: 42, md: 62 },
-              lineHeight: 1.1,
-              fontWeight: 800,
-              color: "#0f172a",
-              letterSpacing: "-0.035em",
-              mb: 3,
-            }}
-          >
-            Built by founders who<br />
-            <Box
-              component="span"
+      <Container
+        maxWidth="md"
+        sx={{ position: "relative", zIndex: 1, pt: { xs: 10, md: 14 }, pb: { xs: 10, md: 16 } }}
+      >
+        {/* Hero */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <Box textAlign="center" mb={{ xs: 8, md: 10 }}>
+            <Chip
+              icon={<WorkOutlineIcon sx={{ fontSize: 15, color: GREEN }} />}
+              label="ABOUT"
               sx={{
-                background: `linear-gradient(135deg, ${GREEN} 0%, #2563eb 100%)`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                mb: 3,
+                px: 2,
+                py: 1,
+                fontSize: 13,
+                fontWeight: 700,
+                bgcolor: GREEN_LIGHT,
+                color: GREEN,
+                border: `1px solid ${alpha(GREEN, 0.3)}`,
+              }}
+            />
+            <Typography
+              variant="h1"
+              sx={{
+                fontSize: { xs: 36, md: 56 },
+                fontWeight: 800,
+                color: "#0f172a",
+                lineHeight: 1.1,
+                letterSpacing: "-0.03em",
+                mb: 2.5,
               }}
             >
-              believe in better.
-            </Box>
-          </Typography>
+              Built on experience.{" "}
+              <Box
+                component="span"
+                sx={{
+                  background: `linear-gradient(135deg, ${GREEN} 0%, #2563eb 100%)`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Driven by people.
+              </Box>
+            </Typography>
+            <Typography
+              sx={{
+                maxWidth: 580,
+                mx: "auto",
+                fontSize: { xs: 16, md: 18 },
+                color: "#475569",
+                lineHeight: 1.75,
+              }}
+            >
+              18+ years of connecting skilled professionals with global career opportunities — and helping
+              organisations build strong, successful teams worldwide.
+            </Typography>
+          </Box>
+        </motion.div>
 
-          <Typography
+        {/* Profile Card */}
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}>
+          <Box
             sx={{
-              maxWidth: 680,
-              mx: "auto",
-              fontSize: { xs: 17, md: 19 },
-              color: "#475569",
-              lineHeight: 1.75,
+              bgcolor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              borderRadius: 4,
+              p: { xs: 3.5, md: 6 },
+              boxShadow: "0 4px 20px rgba(15,23,42,0.06)",
+              mb: 3,
+              transition: "all 0.3s ease",
+              "&:hover": {
+                borderColor: alpha(GREEN, 0.5),
+                boxShadow: `0 15px 40px ${alpha(GREEN, 0.12)}`,
+                transform: "translateY(-4px)",
+              },
             }}
           >
-            We create technology that removes barriers and amplifies human potential.
-          </Typography>
-        </Box>
+            {/* Name + Avatar */}
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={3} alignItems={{ xs: "center", sm: "flex-start" }} mb={4}>
+              <Avatar
+                sx={{
+                  width: 90,
+                  height: 90,
+                  bgcolor: GREEN_LIGHT,
+                  color: GREEN,
+                  fontWeight: 800,
+                  fontSize: "1.8rem",
+                  border: `4px solid ${alpha(GREEN, 0.25)}`,
+                }}
+              >
+                {founder.initials}
+              </Avatar>
+              <Box textAlign={{ xs: "center", sm: "left" }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 26, color: "#0f172a" }}>{founder.name}</Typography>
+                <Typography sx={{ color: GREEN, fontWeight: 600, fontSize: 15, mb: 0.5 }}>{founder.title}</Typography>
+                <Typography sx={{ color: "#64748b", fontSize: 14, lineHeight: 1.55 }}>{founder.subtitle}</Typography>
+              </Box>
+            </Stack>
 
-        {/* Founders Section */}
-        <Box mb={8}>
-          <Typography
-            variant="h2"
+            {/* Bio */}
+            <Typography sx={{ color: "#475569", lineHeight: 1.8, mb: 4, fontSize: 16 }}>
+              {founder.bio}
+            </Typography>
+
+            {/* Tags */}
+            <Typography sx={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", mb: 1.5, letterSpacing: "0.08em" }}>
+              CORE EXPERTISE
+            </Typography>
+            <Stack direction="row" flexWrap="wrap" gap={1} mb={4}>
+              {founder.tags.map((t) => (
+                <Chip
+                  key={t}
+                  label={t}
+                  size="small"
+                  sx={{ bgcolor: GREEN_LIGHT, color: GREEN, fontWeight: 600, fontSize: 13 }}
+                />
+              ))}
+            </Stack>
+
+            <Divider sx={{ my: 4 }} />
+
+            {/* Stats */}
+            <Grid container spacing={1.5} mb={4}>
+              {founder.stats.map((s) => (
+                <Grid item xs={6} sm={3} key={s.label}>
+                  <StatCard num={s.num} label={s.label} />
+                </Grid>
+              ))}
+            </Grid>
+
+            <Divider sx={{ my: 4 }} />
+
+            {/* Highlights */}
+            <Typography sx={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", mb: 2, letterSpacing: "0.08em" }}>
+              KEY HIGHLIGHTS
+            </Typography>
+            <Stack spacing={1.5} mb={4}>
+              {founder.highlights.map((h, i) => (
+                <Stack key={i} direction="row" spacing={1.5} alignItems="flex-start">
+                  <StarBorderRoundedIcon sx={{ color: GREEN, fontSize: 18, mt: "3px", flexShrink: 0 }} />
+                  <Typography sx={{ fontSize: 15, color: "#1e293b", lineHeight: 1.65 }}>{h}</Typography>
+                </Stack>
+              ))}
+            </Stack>
+
+            <Divider sx={{ my: 4 }} />
+
+            {/* Industries */}
+            <Typography sx={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", mb: 2, letterSpacing: "0.08em" }}>
+              INDUSTRIES SERVED
+            </Typography>
+            <Grid container spacing={1} mb={4}>
+              {founder.industries.map((ind) => (
+                <Grid item xs={12} sm={6} key={ind}>
+                  <Box
+                    sx={{
+                      bgcolor: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 2,
+                      px: 2,
+                      py: 1.25,
+                      fontSize: 14,
+                      color: "#334155",
+                    }}
+                  >
+                    {ind}
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+
+            <Divider sx={{ my: 4 }} />
+
+            {/* Why Connect */}
+            <Typography sx={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", mb: 2, letterSpacing: "0.08em" }}>
+              WHY COMPANIES PREFER TO CONNECT
+            </Typography>
+            <Grid container spacing={1}>
+              {founder.whyConnect.map((w) => (
+                <Grid item xs={12} sm={6} key={w}>
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <CheckCircleOutlineIcon sx={{ color: GREEN, fontSize: 18, flexShrink: 0 }} />
+                    <Typography sx={{ fontSize: 14, color: "#1e293b" }}>{w}</Typography>
+                  </Stack>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </motion.div>
+
+        {/* Contact Card */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
+          <Box
             sx={{
-              fontSize: { xs: 32, md: 42 },
-              fontWeight: 800,
-              textAlign: "center",
-              color: "#0f172a",
-              mb: 1.5,
+              bgcolor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              borderRadius: 4,
+              p: { xs: 3.5, md: 5 },
+              boxShadow: "0 4px 20px rgba(15,23,42,0.06)",
             }}
           >
-            Meet the Founder
-          </Typography>
-          <Typography sx={{ textAlign: "center", color: "#64748b", maxWidth: 500, mx: "auto" }}>
-            Visionary leader building technology with purpose.
-          </Typography>
-        </Box>
+            <Typography sx={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", mb: 2.5, letterSpacing: "0.08em" }}>
+              CONTACT
+            </Typography>
 
-        {/* Centered Single Founder */}
-        <Grid container justifyContent="center">
-          <Grid item xs={12} md={8} lg={7}>
-            {foundersData.founders.map((founder: any, i: number) => (
-              <FounderCard key={i} founder={founder} delay={0.1} />
-            ))}
-          </Grid>
-        </Grid>
+            <Stack spacing={2} mb={3}>
+              {/* Email */}
+              <Tooltip title={copied === "email" ? "Copied!" : "Copy Email"} placement="top">
+                <Stack
+                  direction="row"
+                  spacing={2.5}
+                  alignItems="center"
+                  onClick={() => copy(founder.contact.email, "email")}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(GREEN, 0.3)}`,
+                    cursor: "pointer",
+                    "&:hover": { bgcolor: GREEN_LIGHT, borderColor: GREEN },
+                  }}
+                >
+                  <EmailOutlinedIcon sx={{ color: GREEN, fontSize: 22 }} />
+                  <Typography sx={{ fontSize: 15.5, fontWeight: 500, color: "#1e293b" }}>
+                    {founder.contact.email}
+                  </Typography>
+                </Stack>
+              </Tooltip>
+
+              {/* Phone */}
+              <Tooltip title={copied === "phone" ? "Copied!" : "Copy Phone"} placement="top">
+                <Stack
+                  direction="row"
+                  spacing={2.5}
+                  alignItems="center"
+                  onClick={() => copy(founder.contact.phone, "phone")}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha("#2563eb", 0.3)}`,
+                    cursor: "pointer",
+                    "&:hover": { bgcolor: "#dbeafe", borderColor: "#2563eb" },
+                  }}
+                >
+                  <PhoneOutlinedIcon sx={{ color: "#2563eb", fontSize: 22 }} />
+                  <Typography sx={{ fontSize: 15.5, fontWeight: 500, color: "#1e293b" }}>
+                    {founder.contact.phone}
+                  </Typography>
+                </Stack>
+              </Tooltip>
+            </Stack>
+
+            {/* Socials */}
+            <Stack direction="row" spacing={1.5}>
+              <Box
+                component="a"
+                href={founder.socials[0].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 1,
+                  px: 2.5,
+                  py: 1.25,
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 2,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: "#475569",
+                  textDecoration: "none",
+                  "&:hover": { bgcolor: "#f1f5f9", color: "#0f172a" },
+                }}
+              >
+                <LinkedInIcon sx={{ fontSize: 18 }} />
+                LinkedIn
+              </Box>
+              {/* <Box
+                component="a"
+                href={founder.socials[1].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 1,
+                  px: 2.5,
+                  py: 1.25,
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 2,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: "#475569",
+                  textDecoration: "none",
+                  "&:hover": { bgcolor: "#f1f5f9", color: "#0f172a" },
+                }}
+              >
+                <TwitterIcon sx={{ fontSize: 18 }} />
+                Twitter / X
+              </Box> */}
+            </Stack>
+          </Box>
+        </motion.div>
       </Container>
     </Box>
   );
