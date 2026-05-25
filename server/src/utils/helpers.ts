@@ -74,7 +74,7 @@
 //   });
 
 
- import jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { Response } from "express";
 import { JwtPayload, ApiResponse, Role } from "../types";
 import { Types } from "mongoose";
@@ -103,12 +103,10 @@ export const verifyToken = (token: string): JwtPayload => {
 // ─── HTTP Cookie ──────────────────────────────────────────────────────────────
 export const sendTokenCookie = (res: Response, token: string): void => {
   const days = parseInt(process.env.JWT_COOKIE_EXPIRES_IN ?? "7", 10);
-  const isProd = process.env.NODE_ENV === "production"; // ← CHANGED
-
   res.cookie("token", token, {
     httpOnly: true,
-    secure: isProd,                     // ← CHANGED: true only on HTTPS
-    sameSite: isProd ? "none" : "lax",  // ← CHANGED: "none" for cross-origin
+    secure: true,       // always true — Vercel is always HTTPS
+    sameSite: "none",   // always none — frontend and backend are cross-origin on Vercel
     maxAge: days * 24 * 60 * 60 * 1000,
   });
 };
