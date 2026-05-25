@@ -100,10 +100,12 @@ export function ApplicationsModal({ job, onClose, onViewProfile, onViewApplicati
         )}
 
         {!loading && (data?.items ?? []).map((app) => {
-          const applicant = typeof app.applicant === "object" ? (app.applicant as IJobSeekerProfile) : null;
+          // ✅ applicant is a User object with name directly on it
+          const applicant = typeof app.applicant === "object" ? app.applicant : null;
+          const profile = app.applicantProfile ?? null;
           const userId = applicant?._id ?? (typeof app.applicant === "string" ? app.applicant : null);
-          const name = applicant?.user?.name ?? "Applicant";
-          const headline = applicant?.headline ?? applicant?.user?.email ?? "";
+          const name = applicant?.name ?? "Applicant";                        // ✅ direct .name
+          const headline = profile?.headline ?? applicant?.email ?? "";
 
           return (
             <Box

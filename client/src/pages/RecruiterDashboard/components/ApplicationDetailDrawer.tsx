@@ -33,11 +33,11 @@ export function ApplicationDetailDrawer({ applicationId, onClose, onViewProfile 
       .finally(() => setLoading(false));
   }, [applicationId]);
 
-  const applicant = app && typeof app.applicant === "object"
-    ? (app.applicant as IJobSeekerProfile)
-    : null;
+  // applicant is a User object, profile is separate
+  const applicant = app && typeof app.applicant === "object" ? app.applicant : null;
+  const profile = app?.applicantProfile ?? null;
   const userId = applicant?._id ?? (typeof app?.applicant === "string" ? app.applicant : null);
-  const name = applicant?.user?.name ?? "Applicant";
+  const name = applicant?.name ?? "Applicant";   
 
   const STATUS_COLOR: Record<string, "default" | "warning" | "info" | "error" | "success"> = {
     pending: "default",
@@ -81,8 +81,8 @@ export function ApplicationDetailDrawer({ applicationId, onClose, onViewProfile 
               </Avatar>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography variant="body1" sx={{ fontWeight: 700 }}>{name}</Typography>
-                {applicant?.headline && (
-                  <Typography variant="caption" color="text.secondary" noWrap>{applicant.headline}</Typography>
+                {profile?.headline && (
+                  <Typography variant="caption" color="text.secondary" noWrap>{profile.headline}</Typography>
                 )}
                 <Typography variant="caption" color="text.disabled" display="block">
                   Applied {timeAgo(app.createdAt)}

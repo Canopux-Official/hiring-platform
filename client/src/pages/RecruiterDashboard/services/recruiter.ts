@@ -57,12 +57,19 @@ export interface IJob {
 export interface IApplication {
   _id: string;
   job: string | IJob;
-  applicant: string | IJobSeekerProfile;
+  applicant: string | {         //  applicant is a User, not IJobSeekerProfile
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+  };
   recruiter: string;
   coverLetter?: string;
   resumeUrl?: string;
   status: ApplicationStatus;
   recruiterNotes?: string;
+  applicantProfile?: IJobSeekerProfile | null;  
   statusHistory: {
     status: ApplicationStatus;
     changedAt: string;
