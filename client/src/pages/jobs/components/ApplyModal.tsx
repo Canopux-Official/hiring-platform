@@ -135,7 +135,7 @@ export default function ApplyModal({
               />
             </Box>
 
-            <Box>
+            {/* <Box>
               <Typography
                 variant="caption"
                 fontWeight={700}
@@ -151,7 +151,7 @@ export default function ApplyModal({
                 value={resumeUrl}
                 onChange={(e) => setResumeUrl(e.target.value)}
               />
-            </Box>
+            </Box> */}
 
             <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
               <Button onClick={onClose} disabled={loading}>

@@ -199,6 +199,7 @@ export interface CreateJobPayload {
   openings: number;
   applicationDeadline?: string;
   status?: JobStatus;
+  category?: string;
 }
  
 export async function createJob(payload: CreateJobPayload): Promise<IJob> {
