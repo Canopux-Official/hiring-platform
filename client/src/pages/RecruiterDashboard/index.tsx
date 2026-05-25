@@ -15,7 +15,7 @@ import { alpha } from "@mui/material/styles";
 import { useAuth } from "../../pages/signin/lib/auth";
 import { useToast } from "../../hooks/useToast";
 import NewJobModal from "./components/NewJobModal";
-import { EditJobModal } from "./components/EditJobModal";
+ 
 import {
   fetchMyJobs,
   fetchRecruiterStats,
@@ -31,6 +31,7 @@ import { ApplicationDetailDrawer } from "./components/ApplicationDetailDrawer";
 import { ApplicationsModal } from "./components/ApplicationsModal";
 
 import { getErrorMessage } from "../../utils/errorUtils";
+import { EditJobModal } from "./components/EditJobModal";
 
 export default function RecruiterDashboard() {
   const { user } = useAuth();
