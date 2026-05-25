@@ -193,7 +193,6 @@ export interface CreateJobPayload {
   responsibilities: string[];
   skills: string[];
   company: string;
-  category?: string;
   location: string;
   type: JobType;
   experienceLevel: ExperienceLevel;

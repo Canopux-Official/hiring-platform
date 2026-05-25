@@ -526,6 +526,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
   MenuItem as MuiMenuItem, Grid, Typography, Divider, Chip, Box,
   InputAdornment, IconButton, Stack,
+  MenuItem,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -582,6 +583,8 @@ const CATEGORIES: { value: JobCategory; label: string }[] = [
 ];
 
 const CURRENCIES = ["USD", "EUR", "GBP", "INR", "AED", "CAD", "AUD", "SGD"];
+
+
 
 // ─── Section Header ───────────────────────────────────────────────────────────
 
@@ -740,7 +743,7 @@ export function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
     setCategory((job as any).category ?? "engineering");
     setDescription(job.description ?? "");
     setLocation(job.location ?? "");
-    setCategory(job.category ?? "");
+    setCategory((job.category || "") as JobCategory);
     setType((job.type as JobType) ?? "full_time");
     setExperienceLevel((job.experienceLevel as ExperienceLevel) ?? "mid");
     setStatus((job.status as JobStatus) ?? "open");
@@ -899,12 +902,12 @@ export function EditJobModal({ job, onClose, onSaved }: EditJobModalProps) {
               select
               label="Category"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => setCategory(e.target.value as JobCategory)}
               fullWidth
               size="small"
             >
               {["Engineering", "Design", "Creative", "Hospitality", "Logistics", "Executive", "Other"].map((c) => (
-                <MuiMenuItem key={c} value={c}>{c}</MuiMenuItem>
+                <MenuItem key={c} value={c}>{c}</MenuItem>
               ))}
             </TextField>
           </Grid>
