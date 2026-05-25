@@ -1,8 +1,4 @@
-﻿// // components/SignIn/index.tsx
-// // Orchestrates RolePicker â†’ SignInForm / RegisterForm
-// // Drop-in replacement for the old pages/SignIn.tsx
-
-// import { useState, useEffect } from "react";
+﻿// import { useState, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 // import { Box, Container } from "@mui/material";
 // import { AnimatePresence } from "framer-motion";
@@ -14,7 +10,6 @@
 // import RolePicker from "./components/RolePicker";
 // import SignInForm from "./components/SigninForm";
 // import RegisterForm from "./components/RegisterForm";
-
 
 // export default function SignIn() {
 //   const [step, setStep] = useState<AuthStep>("role");
@@ -32,16 +27,12 @@
 
 //   if (loading) return null;
 
-//   // â”€â”€ Field handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
 //   const onField =
 //     (key: keyof FormState) =>
 //     (e: React.ChangeEvent<HTMLInputElement>) => {
 //       setForm((prev) => ({ ...prev, [key]: e.target.value }));
 //       setErr("");
 //     };
-
-//   // â”€â”€ Navigation helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 //   const goToRole = () => {
 //     setStep("role");
@@ -67,13 +58,6 @@
 //     setStep("signIn");
 //   };
 
-//   // const autofill = () => {
-//   //   const c = demoCredentials[role];
-//   //   setForm((prev) => ({ ...prev, email: c.email, password: c.password }));
-//   // };
-
-//   // â”€â”€ Submit handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
 //   const handleSignIn = async (e: React.FormEvent) => {
 //     e.preventDefault();
 //     setErr("");
@@ -87,7 +71,7 @@
 //     }
 //   };
 
-//   const handleRegister = async (e: React.FormEvent) => {
+//   const handleRegister = async (e: React.FormEvent): Promise<{ pendingApproval?: boolean } | void> => {
 //     e.preventDefault();
 //     setErr("");
 
@@ -105,14 +89,24 @@
 //         role,
 //         phone: form.phone.trim() || undefined,
 //       });
-//       if (!result.ok) { setErr(result.error ?? "Registration failed."); return; }
+
+//       if (!result.ok) {
+//         setErr(result.error ?? "Registration failed.");
+//         return;
+//       }
+
+//       // âœ… Recruiter pending approval â€” return flag to RegisterForm
+//       // RegisterForm will show the pending screen; do NOT navigate away
+//       if (result.pendingApproval) {
+//         return { pendingApproval: true };
+//       }
+
+//       // âœ… Normal flow (job seeker) â€” navigate to dashboard
 //       nav(roleHome(role), { replace: true });
 //     } finally {
 //       setSubmitting(false);
 //     }
 //   };
-
-//   // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 //   return (
 //     <Box
@@ -123,9 +117,10 @@
 //         px: 2,
 //         py: 6,
 //         background: `
-//           radial-gradient(circle at 30% 20%, ${alpha("#7c3aed", 0.15)}, transparent 50%),
-//           radial-gradient(circle at 70% 70%, ${alpha("#7c9cff", 0.1)}, transparent 50%)
+//           radial-gradient(circle at 30% 20%, ${alpha("#7c3aed", 0.08)}, transparent 50%),
+//           radial-gradient(circle at 70% 70%, ${alpha("#a78bfa", 0.06)}, transparent 50%)
 //         `,
+//         bgcolor: "#f9fafb",
 //       }}
 //     >
 //       <Container maxWidth="md">
@@ -153,7 +148,7 @@
 //               submitting={submitting}
 //               onBack={goToRole}
 //               onField={onField}
-//               onSubmit={handleRegister}
+//               onSubmit={handleRegister}  // âœ… now returns pendingApproval flag
 //               onGoSignIn={goSignIn}
 //             />
 //           )}
@@ -163,7 +158,6 @@
 //   );
 // }
 
-// components/SignIn/index.tsx
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -177,6 +171,10 @@ import { emptyForm, roleHome, validatePassword } from "./utils/auth.utils";
 import RolePicker from "./components/RolePicker";
 import SignInForm from "./components/SigninForm";
 import RegisterForm from "./components/RegisterForm";
+
+// ── Design Tokens (Consistent with Hero) ─────────────────────────────
+const GREEN = "#059669";
+const BLUE = "#2563eb";
 
 export default function SignIn() {
   const [step, setStep] = useState<AuthStep>("role");
@@ -231,7 +229,10 @@ export default function SignIn() {
     setSubmitting(true);
     try {
       const result = await signIn(form.email, form.password, role);
-      if (!result.ok) { setErr(result.error ?? "Sign in failed."); return; }
+      if (!result.ok) { 
+        setErr(result.error ?? "Sign in failed."); 
+        return; 
+      }
       nav(roleHome(role), { replace: true });
     } finally {
       setSubmitting(false);
@@ -242,10 +243,21 @@ export default function SignIn() {
     e.preventDefault();
     setErr("");
 
-    if (form.name.trim().length < 2) { setErr("Name must be at least 2 characters."); return; }
+    if (form.name.trim().length < 2) { 
+      setErr("Name must be at least 2 characters."); 
+      return; 
+    }
+    
     const pwdErr = validatePassword(form.password);
-    if (pwdErr) { setErr(pwdErr); return; }
-    if (form.password !== form.confirmPassword) { setErr("Passwords do not match."); return; }
+    if (pwdErr) { 
+      setErr(pwdErr); 
+      return; 
+    }
+    
+    if (form.password !== form.confirmPassword) { 
+      setErr("Passwords do not match."); 
+      return; 
+    }
 
     setSubmitting(true);
     try {
@@ -262,13 +274,12 @@ export default function SignIn() {
         return;
       }
 
-      // âœ… Recruiter pending approval â€” return flag to RegisterForm
-      // RegisterForm will show the pending screen; do NOT navigate away
+      // Recruiter pending approval — return flag to RegisterForm
       if (result.pendingApproval) {
         return { pendingApproval: true };
       }
 
-      // âœ… Normal flow (job seeker) â€” navigate to dashboard
+      // Normal flow (job seeker) — navigate to dashboard
       nav(roleHome(role), { replace: true });
     } finally {
       setSubmitting(false);
@@ -284,13 +295,27 @@ export default function SignIn() {
         px: 2,
         py: 6,
         background: `
-          radial-gradient(circle at 30% 20%, ${alpha("#7c3aed", 0.08)}, transparent 50%),
-          radial-gradient(circle at 70% 70%, ${alpha("#a78bfa", 0.06)}, transparent 50%)
+          radial-gradient(circle at 30% 20%, ${alpha(GREEN, 0.09)}, transparent 60%),
+          radial-gradient(circle at 70% 75%, ${alpha(BLUE, 0.08)}, transparent 60%)
         `,
-        bgcolor: "#f9fafb",
+        bgcolor: "#f8fafc",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <Container maxWidth="md">
+      {/* Subtle dot grid background */}
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `radial-gradient(circle, ${alpha(GREEN, 0.12)} 1px, transparent 1px)`,
+          backgroundSize: "32px 32px",
+          opacity: 0.4,
+          pointerEvents: "none",
+        }}
+      />
+
+      <Container maxWidth="md" sx={{ position: "relative", zIndex: 1 }}>
         <AnimatePresence mode="wait">
           {step === "role" && <RolePicker onPick={pickRole} />}
 
@@ -315,7 +340,7 @@ export default function SignIn() {
               submitting={submitting}
               onBack={goToRole}
               onField={onField}
-              onSubmit={handleRegister}  // âœ… now returns pendingApproval flag
+              onSubmit={handleRegister}
               onGoSignIn={goSignIn}
             />
           )}

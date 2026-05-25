@@ -2,9 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import SiteNav from "./components/SiteNav";
 import SiteFooter from "./components/SiteFooter";
-import Home from "./pages/Home";
-
-import Talent from "./pages/Talent";
+import Home from "./pages/Home"; 
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 
 import AdminDashboard from "./pages/AdminDashboard";
@@ -14,6 +12,7 @@ import type { Role } from "./pages/signin/lib/auth"; // to be changed
 import SignIn from "./pages/signin/SignIn";
 import SeekerDashboard from "./pages/seeker/SeekerDashboard";
 import Jobs from "./pages/jobs/Jobs";
+import AboutPage from "./pages/About";
 
 // ─── Role-based redirect helper ────────────────────────────────────────────────
 
@@ -46,7 +45,7 @@ export default function App() {
             {/* Public */}
             <Route path="/" element={<Home />} />
             <Route path="/jobs" element={<Jobs />} />
-            <Route path="/talent" element={<Talent />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/signin" element={<SignIn />} />
 
             {/* Protected — Recruiter */}

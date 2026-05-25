@@ -14,46 +14,50 @@ import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import { useAuth } from "../pages/signin/lib/auth";
 import { alpha } from "@mui/material/styles";
+import logo from '../assets/logo.png'
 
-// ── Sidebar palette ─────────────────────────────────────────────
-const SIDEBAR   = "#111827";
-const SIDEBAR_ACTIVE = "#7c3aed";
-const SIDEBAR_HOVER  = alpha("#7c3aed", 0.15);
-const VIOLET    = "#7c3aed";
+// ── Design Tokens (Same as Hero) ─────────────────────────────────────
+const GREEN = "#059669";
+const GREEN_DARK = "#047857";
+const BLUE = "#2563eb";
+const BLUE_DARK = "#1d4ed8";
+
+const SIDEBAR = "#0f172a";           // Dark slate (matches premium feel)
+const SIDEBAR_ACTIVE = GREEN;        // Now uses your primary green
+const SIDEBAR_HOVER = alpha(GREEN, 0.15);
 
 const navLinks = [
-  { to: "/jobs",   label: "Find Jobs",  icon: <WorkOutlineIcon sx={{ fontSize: 20 }} /> },
-  { to: "/talent", label: "Talent",     icon: <PeopleOutlineIcon sx={{ fontSize: 20 }} /> },
+  { to: "/jobs", label: "Find Jobs", icon: <WorkOutlineIcon sx={{ fontSize: 20 }} /> },
+  { to: "/about", label: "About", icon: <PeopleOutlineIcon sx={{ fontSize: 20 }} /> },
 ];
 
 export default function SiteNav() {
   const { user, signOut } = useAuth();
-  const nav  = useNavigate();
-  const loc  = useLocation();
+  const nav = useNavigate();
+  const loc = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [anchor, setAnchor] = useState<null | HTMLElement>(null);
   const [drawer, setDrawer] = useState(false);
 
   const getDashboardRoute = () => {
-    if (user?.role === "admin")     return "/admin";
+    if (user?.role === "admin") return "/admin";
     if (user?.role === "recruiter") return "/dashboard";
     return "/seeker";
   };
 
   const getRoleLabel = () => {
-    if (user?.role === "admin")     return "Admin";
+    if (user?.role === "admin") return "Admin";
     if (user?.role === "recruiter") return "Recruiter";
     return "Job Seeker";
   };
 
   const isActive = (path: string) => loc.pathname === path;
 
-  // ── Shared sidebar content ──────────────────────────────────────
+  // ── Shared Sidebar Content ──────────────────────────────────────
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
     <Box
       sx={{
-        width: 240,
+        width: 260,
         height: "100%",
         bgcolor: SIDEBAR,
         display: "flex",
@@ -62,42 +66,69 @@ export default function SiteNav() {
       }}
     >
       {/* Logo */}
-      <Box sx={{ px: 3, mb: 4, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <Box sx={{ px: 3, mb: 5, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Box
           component={RouterLink}
           to="/"
           onClick={onClose}
-          sx={{ display: "flex", alignItems: "center", gap: 1.5, textDecoration: "none" }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            textDecoration: "none"
+          }}
         >
+          {/* Custom Logo Image */}
           <Box
             sx={{
-              width: 36, height: 36, borderRadius: "10px",
-              background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-              display: "grid", placeItems: "center",
-              boxShadow: `0 4px 14px ${alpha(VIOLET, 0.5)}`,
+              width: 42,
+              height: 42,
+              borderRadius: "10px",
+              overflow: "hidden",
+              boxShadow: `0 4px 18px ${alpha(GREEN, 0.4)}`,
               flexShrink: 0,
             }}
           >
-            <HubOutlinedIcon sx={{ color: "#ffffff", fontSize: 20 }} />
+            <img
+              src={logo}
+              alt="RagasHire"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+            />
           </Box>
-          <Typography sx={{ fontWeight: 800, fontSize: 17, color: "#ffffff", letterSpacing: "-0.02em" }}>
+
+          {/* Optional: Keep brand name next to logo */}
+          <Typography sx={{
+            fontWeight: 800,
+            fontSize: 19,
+            color: "#ffffff",
+            letterSpacing: "-0.025em"
+          }}>
             RagasHire
           </Typography>
         </Box>
+
         {onClose && (
-          <IconButton onClick={onClose} sx={{ color: alpha("#ffffff", 0.4), p: 0.5 }}>
-            <CloseIcon sx={{ fontSize: 18 }} />
+          <IconButton onClick={onClose} sx={{ color: alpha("#ffffff", 0.5), p: 0.5 }}>
+            <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         )}
       </Box>
 
-      {/* Nav section label */}
-      <Typography sx={{ px: 3, mb: 1, fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: alpha("#ffffff", 0.3) }}>
-        Main Menu
+      {/* Main Menu Label */}
+      <Typography sx={{
+        px: 3, mb: 1.5, fontSize: 11, fontWeight: 700,
+        letterSpacing: "0.12em", textTransform: "uppercase",
+        color: alpha("#94a3b8", 0.7)
+      }}>
+        MAIN MENU
       </Typography>
 
-      {/* Nav links */}
-      <List sx={{ px: 1.5, flex: 1 }}>
+      {/* Navigation Links */}
+      <List sx={{ px: 2, flex: 1 }}>
         {navLinks.map((l) => {
           const active = isActive(l.to);
           return (
@@ -107,17 +138,22 @@ export default function SiteNav() {
               to={l.to}
               onClick={onClose}
               sx={{
-                borderRadius: 2,
+                borderRadius: 2.5,
                 mb: 0.5,
-                px: 2,
-                py: 1.25,
+                px: 2.5,
+                py: 1.4,
                 bgcolor: active ? SIDEBAR_ACTIVE : "transparent",
-                gap: 1.5,
-                "&:hover": { bgcolor: active ? SIDEBAR_ACTIVE : SIDEBAR_HOVER },
-                transition: "background 0.15s",
+                gap: 2,
+                "&:hover": {
+                  bgcolor: active ? SIDEBAR_ACTIVE : SIDEBAR_HOVER
+                },
+                transition: "all 0.2s ease",
               }}
             >
-              <Box sx={{ color: active ? "#ffffff" : alpha("#ffffff", 0.5), display: "flex" }}>
+              <Box sx={{
+                color: active ? "#ffffff" : alpha("#ffffff", 0.6),
+                display: "flex"
+              }}>
                 {l.icon}
               </Box>
               <ListItemText
@@ -125,9 +161,9 @@ export default function SiteNav() {
                 slotProps={{
                   primary: {
                     sx: {
-                      fontSize: 14.5,
+                      fontSize: 15,
                       fontWeight: active ? 600 : 500,
-                      color: active ? "#ffffff" : alpha("#ffffff", 0.6),
+                      color: active ? "#ffffff" : alpha("#e2e8f0", 0.85),
                     },
                   },
                 }}
@@ -136,25 +172,36 @@ export default function SiteNav() {
           );
         })}
 
-        {/* Dashboard link if logged in */}
+        {/* Dashboard for logged-in users */}
         {user && (
           <>
-            <Divider sx={{ my: 2, borderColor: alpha("#ffffff", 0.08) }} />
-            <Typography sx={{ px: 1.5, mb: 1, fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: alpha("#ffffff", 0.3) }}>
-              My Account
+            <Divider sx={{ my: 2.5, borderColor: alpha("#ffffff", 0.08) }} />
+            <Typography sx={{
+              px: 3, mb: 1.5, fontSize: 11, fontWeight: 700,
+              letterSpacing: "0.12em", textTransform: "uppercase",
+              color: alpha("#94a3b8", 0.7)
+            }}>
+              MY ACCOUNT
             </Typography>
             <ListItemButton
               component={RouterLink}
               to={getDashboardRoute()}
               onClick={onClose}
               sx={{
-                borderRadius: 2, mb: 0.5, px: 2, py: 1.25, gap: 1.5,
+                borderRadius: 2.5,
+                mb: 0.5,
+                px: 2.5,
+                py: 1.4,
+                gap: 2,
                 bgcolor: isActive(getDashboardRoute()) ? SIDEBAR_ACTIVE : "transparent",
                 "&:hover": { bgcolor: SIDEBAR_HOVER },
-                transition: "background 0.15s",
+                transition: "all 0.2s ease",
               }}
             >
-              <Box sx={{ color: isActive(getDashboardRoute()) ? "#ffffff" : alpha("#ffffff", 0.5), display: "flex" }}>
+              <Box sx={{
+                color: isActive(getDashboardRoute()) ? "#ffffff" : alpha("#ffffff", 0.6),
+                display: "flex"
+              }}>
                 <DashboardOutlinedIcon sx={{ fontSize: 20 }} />
               </Box>
               <ListItemText
@@ -162,8 +209,9 @@ export default function SiteNav() {
                 slotProps={{
                   primary: {
                     sx: {
-                      fontSize: 14.5, fontWeight: 500,
-                      color: isActive(getDashboardRoute()) ? "#ffffff" : alpha("#ffffff", 0.6),
+                      fontSize: 15,
+                      fontWeight: 500,
+                      color: isActive(getDashboardRoute()) ? "#ffffff" : alpha("#e2e8f0", 0.85),
                     },
                   },
                 }}
@@ -173,66 +221,104 @@ export default function SiteNav() {
         )}
       </List>
 
-      {/* Bottom user section */}
-      <Box sx={{ px: 1.5, mt: "auto" }}>
-        <Divider sx={{ mb: 2, borderColor: alpha("#ffffff", 0.08) }} />
+      {/* Bottom User Section */}
+      <Box sx={{ px: 2, mt: "auto" }}>
+        <Divider sx={{ mb: 3, borderColor: alpha("#ffffff", 0.08) }} />
+
         {user ? (
           <Box
             sx={{
-              px: 2, py: 1.5, borderRadius: 2,
-              bgcolor: alpha("#ffffff", 0.05),
-              display: "flex", alignItems: "center", gap: 1.5,
+              px: 2.5,
+              py: 2,
+              borderRadius: 3,
+              bgcolor: alpha("#ffffff", 0.06),
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
             }}
           >
             <Avatar
               sx={{
-                width: 34, height: 34,
-                background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-                color: "#fff", fontWeight: 700, fontSize: 13, flexShrink: 0,
+                width: 38,
+                height: 38,
+                background: `linear-gradient(135deg, ${GREEN}, ${BLUE})`,
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: 14,
               }}
             >
               {user.avatar}
             </Avatar>
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography sx={{ fontSize: 13, fontWeight: 600, color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <Typography sx={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: "#ffffff",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis"
+              }}>
                 {user.name}
               </Typography>
-              <Typography sx={{ fontSize: 11, color: alpha("#ffffff", 0.4), whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <Typography sx={{
+                fontSize: 12.5,
+                color: alpha("#94a3b8", 0.8),
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis"
+              }}>
                 {user.email}
               </Typography>
             </Box>
             <Tooltip title="Sign out">
               <IconButton
                 onClick={() => { onClose?.(); signOut(); nav("/"); }}
-                sx={{ color: alpha("#ffffff", 0.35), p: 0.5, "&:hover": { color: "#f87171" } }}
+                sx={{ color: alpha("#ffffff", 0.4), "&:hover": { color: "#f87171" } }}
               >
-                <LogoutOutlinedIcon sx={{ fontSize: 17 }} />
+                <LogoutOutlinedIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
           </Box>
         ) : (
-          <Stack spacing={1.5} sx={{ px: 0.5 }}>
+          <Stack spacing={1.5} sx={{ px: 1 }}>
             <Button
-              fullWidth component={RouterLink} to="/signin" onClick={onClose}
+              fullWidth
+              component={RouterLink}
+              to="/signin"
+              onClick={onClose}
               sx={{
-                color: alpha("#ffffff", 0.6), borderRadius: 2, py: 1.2, fontSize: 14,
-                border: `1px solid ${alpha("#ffffff", 0.12)}`,
-                "&:hover": { bgcolor: alpha("#ffffff", 0.06), color: "#ffffff" },
+                color: alpha("#e2e8f0", 0.8),
+                borderRadius: 2.5,
+                py: 1.4,
+                fontSize: 14.5,
+                border: `1px solid ${alpha("#ffffff", 0.15)}`,
+                "&:hover": {
+                  bgcolor: alpha("#ffffff", 0.08),
+                  color: "#ffffff"
+                },
               }}
             >
               Sign In
             </Button>
             <Button
-              fullWidth variant="contained" component={RouterLink} to="/signin" onClick={onClose}
+              fullWidth
+              variant="contained"
+              component={RouterLink}
+              to="/signin"
+              onClick={onClose}
               sx={{
-                py: 1.2, fontSize: 14, fontWeight: 600, borderRadius: 2,
-                background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-                color: "#ffffff",
-                boxShadow: `0 4px 14px ${alpha(VIOLET, 0.4)}`,
-                "&:hover": { background: "linear-gradient(135deg, #6d28d9, #8b5cf6)" },
+                py: 1.4,
+                fontSize: 14.5,
+                fontWeight: 700,
+                borderRadius: 2.5,
+                background: `linear-gradient(135deg, ${GREEN} 0%, ${GREEN_DARK} 100%)`,
+                boxShadow: `0 4px 16px ${alpha(GREEN, 0.4)}`,
+                "&:hover": {
+                  background: `linear-gradient(135deg, ${GREEN_DARK}, #065f46)`,
+                },
               }}
             >
-              Get Started
+              Get Started Free
             </Button>
           </Stack>
         )}
@@ -240,41 +326,79 @@ export default function SiteNav() {
     </Box>
   );
 
-  // ── Desktop: fixed sidebar ──────────────────────────────────────
+  // Desktop: Fixed Sidebar
   if (!isMobile) {
     return (
-      <Box component="nav" sx={{ width: 240, flexShrink: 0, position: "sticky", top: 0, height: "100vh" }}>
+      <Box component="nav" sx={{
+        width: 260,
+        flexShrink: 0,
+        position: "sticky",
+        top: 0,
+        height: "100vh",
+        borderRight: `1px solid ${alpha("#ffffff", 0.08)}`
+      }}>
         <SidebarContent />
       </Box>
     );
   }
 
-  // ── Mobile: top bar + drawer ────────────────────────────────────
+  // Mobile: Top Bar + Drawer
   return (
     <>
       <Box
         component="nav"
         sx={{
-          position: "sticky", top: 0, zIndex: 1200,
+          position: "sticky",
+          top: 0,
+          zIndex: 1200,
           bgcolor: SIDEBAR,
-          display: "flex", alignItems: "center",
-          px: 2, height: 60,
+          display: "flex",
+          alignItems: "center",
+          px: 3,
+          height: 64,
           borderBottom: `1px solid ${alpha("#ffffff", 0.08)}`,
         }}
       >
-        <Box component={RouterLink} to="/" sx={{ display: "flex", alignItems: "center", gap: 1.5, textDecoration: "none", flex: 1 }}>
-          <Box sx={{ width: 32, height: 32, borderRadius: "8px", background: "linear-gradient(135deg, #7c3aed, #a78bfa)", display: "grid", placeItems: "center" }}>
-            <HubOutlinedIcon sx={{ color: "#ffffff", fontSize: 18 }} />
+        <Box
+          component={RouterLink}
+          to="/"
+          sx={{ display: "flex", alignItems: "center", gap: 1.5, textDecoration: "none", flex: 1 }}
+        >
+          <Box
+            sx={{
+              width: 34,
+              height: 34,
+              borderRadius: "10px",
+              background: `linear-gradient(135deg, ${GREEN}, ${BLUE})`,
+              display: "grid",
+              placeItems: "center",
+            }}
+          >
+            <HubOutlinedIcon sx={{ color: "#ffffff", fontSize: 19 }} />
           </Box>
-          <Typography sx={{ fontWeight: 800, fontSize: 16, color: "#ffffff" }}>RagasHire</Typography>
+          <Typography sx={{ fontWeight: 800, fontSize: 17, color: "#ffffff" }}>
+            RagasHire
+          </Typography>
         </Box>
-        <IconButton onClick={() => setDrawer(true)} sx={{ color: alpha("#ffffff", 0.7), border: `1px solid ${alpha("#ffffff", 0.12)}`, borderRadius: 1.5, p: 0.75 }}>
-          <MenuIcon sx={{ fontSize: 22 }} />
+
+        <IconButton
+          onClick={() => setDrawer(true)}
+          sx={{
+            color: alpha("#ffffff", 0.75),
+            border: `1px solid ${alpha("#ffffff", 0.15)}`,
+            borderRadius: 2,
+            p: 1,
+          }}
+        >
+          <MenuIcon sx={{ fontSize: 24 }} />
         </IconButton>
       </Box>
 
-      <Drawer anchor="left" open={drawer} onClose={() => setDrawer(false)}
-        slotProps={{ paper: { sx: { width: 240, bgcolor: SIDEBAR, border: "none" } } }}
+      <Drawer
+        anchor="left"
+        open={drawer}
+        onClose={() => setDrawer(false)}
+        slotProps={{ paper: { sx: { width: 260, bgcolor: SIDEBAR, border: "none" } } }}
       >
         <SidebarContent onClose={() => setDrawer(false)} />
       </Drawer>

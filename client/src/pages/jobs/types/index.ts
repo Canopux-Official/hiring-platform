@@ -41,6 +41,7 @@ export interface Job {
   applicationsCount: number;
   createdAt: string;
   updatedAt: string;
+  category?: string;
 }
 
 export interface PaginatedJobs {

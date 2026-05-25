@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Card, Skeleton, TableRow, TableCell } from "@mui/material";
 
 export function StatCardSkeleton() {

@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Box } from "@mui/material";
 import { Hero } from "./components/Hero";
 import { Features } from "./components/Features";
@@ -11,7 +11,7 @@ export default function Home() {
       <Hero />
       <Features />
       <Testimonials />
-      <CTA />
+      {/* <CTA /> */}
     </Box>
   );
 }
