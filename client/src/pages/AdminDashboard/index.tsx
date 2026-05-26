@@ -202,10 +202,292 @@
 
 
 
+// import { useState, useEffect, useCallback } from "react";
+// import {
+//   Container, Grid, Card, Typography, Stack, Button, Box, Tab, Tabs,
+//   Badge, Avatar, Chip, CircularProgress, Alert,
+// } from "@mui/material";
+// import { alpha } from "@mui/material/styles";
+// import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+// import WorkIcon from "@mui/icons-material/Work";
+// import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+// import AssignmentIcon from "@mui/icons-material/Assignment";
+// import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+// import RefreshIcon from "@mui/icons-material/Refresh";
+// import HourglassTopIcon from "@mui/icons-material/HourglassTop";
+// import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+// import CancelIcon from "@mui/icons-material/Cancel";
+// import { useAuth } from "../../pages/signin/lib/auth";
+// import {
+//   fetchAdminDashboard, IAdminDashboardStats,
+//   fetchPendingRecruiters, reviewRecruiter, IUser, // âœ… new imports
+// } from "./services/admin-api";
+// import { useToast } from "../../hooks/useToast";
+// import { StatCard, PipelineCard, UserRoleCard } from "./components/DashboardCards";
+// import { StatCardSkeleton } from "./components/Skeletons";
+// import { UsersTab } from "./components/UsersTab";
+// import { ApplicationsTab } from "./components/ApplicationsTab";
+// import { getErrorMessage } from "../../utils/errorUtils";
+// import { timeAgo } from "../RecruiterDashboard/utils/constants";
+
+// export default function AdminDashboard() {
+//   const { user } = useAuth();
+//   const toast = useToast();
+
+//   const [stats, setStats] = useState<IAdminDashboardStats | null>(null);
+//   const [statsLoading, setStatsLoading] = useState(true);
+//   const [activeTab, setActiveTab] = useState(0);
+
+//   // âœ… Pending recruiters state
+//   const [pendingRecruiters, setPendingRecruiters] = useState<IUser[]>([]);
+//   const [pendingLoading, setPendingLoading] = useState(false);
+//   const [reviewingId, setReviewingId] = useState<string | null>(null);
+
+//   const loadStats = useCallback(async () => {
+//     setStatsLoading(true);
+//     try {
+//       const s = await fetchAdminDashboard();
+//       setStats(s);
+//     } catch (err) {
+//       toast.error(getErrorMessage(err, "Failed to load dashboard stats."));
+//     } finally {
+//       setStatsLoading(false);
+//     }
+//   }, [toast]);
+
+//   // âœ… Load pending recruiters
+//   const loadPendingRecruiters = useCallback(async () => {
+//     setPendingLoading(true);
+//     try {
+//       const res = await fetchPendingRecruiters();
+//       setPendingRecruiters(res.items);
+//     } catch (err) {
+//       toast.error(getErrorMessage(err, "Failed to load pending recruiters."));
+//     } finally {
+//       setPendingLoading(false);
+//     }
+//   }, [toast]);
+
+//   useEffect(() => {
+//     loadStats();
+//     loadPendingRecruiters();
+//   }, [loadStats, loadPendingRecruiters]);
+
+//   // âœ… Approve or reject a recruiter
+//   async function handleReview(userId: string, action: "approve" | "reject") {
+//     setReviewingId(userId);
+//     try {
+//       await reviewRecruiter(userId, action);
+//       toast.success(
+//         action === "approve"
+//           ? "Recruiter approved â€” they can now log in."
+//           : "Recruiter application rejected."
+//       );
+//       // Remove from pending list
+//       setPendingRecruiters((prev) => prev.filter((r) => r._id !== userId));
+//       loadStats(); // refresh totals
+//     } catch (err) {
+//       toast.error(getErrorMessage(err, `Failed to ${action} recruiter.`));
+//     } finally {
+//       setReviewingId(null);
+//     }
+//   }
+
+//   const statCards = [
+//     {
+//       label: "Total Users",
+//       value: stats?.totalUsers ?? "â€“",
+//       icon: <PeopleAltIcon />,
+//       color: "#60a5fa",
+//       sub: stats ? `${stats.usersByRole.recruiter} recruiters Â· ${stats.usersByRole.job_seeker} seekers` : undefined,
+//     },
+//     {
+//       label: "Total Jobs",
+//       value: stats?.totalJobs ?? "â€“",
+//       icon: <WorkIcon />,
+//       color: "#10b981",
+//       sub: stats ? `${stats.jobsByStatus.open} open Â· ${stats.jobsByStatus.draft} draft` : undefined,
+//     },
+//     {
+//       label: "Applications",
+//       value: stats?.totalApplications ?? "â€“",
+//       icon: <AssignmentIcon />,
+//       color: "#a78bfa",
+//       sub: stats ? `${stats.applicationsByStatus.shortlisted} shortlisted` : undefined,
+//     },
+//     {
+//       label: "Hired",
+//       value: stats?.applicationsByStatus.hired ?? "â€“",
+//       icon: <TrendingUpIcon />,
+//       color: "#f472b6",
+//       sub: stats && stats.totalApplications > 0
+//         ? `${Math.round((stats.applicationsByStatus.hired / stats.totalApplications) * 100)}% conversion`
+//         : stats ? "0% conversion" : undefined,
+//     },
+//   ];
+
+//   return (
+//     <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+//       {/* Header */}
+//       <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between"
+//         alignItems={{ sm: "center" }} spacing={2} sx={{ mb: 4 }}>
+//         <Box>
+//           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.25 }}>
+//             <AdminPanelSettingsIcon sx={{ color: "#7c3aed", fontSize: 18 }} />
+//             <Typography variant="overline" sx={{ color: "#7c3aed", lineHeight: 1 }}>
+//               Admin Control Panel
+//             </Typography>
+//           </Stack>
+//           <Typography variant="h3" sx={{ fontSize: { xs: 26, md: 34 } }}>
+//             Welcome, {user?.name?.split(" ")[0]}
+//           </Typography>
+//           <Typography variant="body2" color="text.secondary">
+//             Full platform oversight â€” users, jobs, and applications
+//           </Typography>
+//         </Box>
+//         <Button variant="outlined" size="small" startIcon={<RefreshIcon />}
+//           onClick={() => { loadStats(); loadPendingRecruiters(); }} disabled={statsLoading}>
+//           Refresh stats
+//         </Button>
+//       </Stack>
+
+//       {/* Stat cards */}
+//       <Grid container spacing={2.5} sx={{ mb: 4 }}>
+//         {statsLoading
+//           ? [0, 1, 2, 3].map((i) => <Grid item xs={6} md={3} key={i}><StatCardSkeleton /></Grid>)
+//           : statCards.map((s) => (
+//             <Grid item xs={6} md={3} key={s.label}>
+//               <StatCard label={s.label} value={s.value} icon={s.icon} color={s.color} sub={s.sub} />
+//             </Grid>
+//           ))}
+//       </Grid>
+
+//       {/* Charts row */}
+//       <Grid container spacing={2.5} sx={{ mb: 4 }}>
+//         <Grid item xs={12} md={7}><PipelineCard stats={stats} loading={statsLoading} /></Grid>
+//         <Grid item xs={12} md={5}><UserRoleCard stats={stats} loading={statsLoading} /></Grid>
+//       </Grid>
+
+//       {/* âœ… Pending Recruiters section â€” shown only when there are pending requests */}
+//       {(pendingLoading || pendingRecruiters.length > 0) && (
+//         <Card sx={{ p: 3, mb: 3, border: `1px solid ${alpha("#f59e0b", 0.3)}`, bgcolor: alpha("#f59e0b", 0.03) }}>
+//           <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+//             <HourglassTopIcon sx={{ color: "#f59e0b", fontSize: 20 }} />
+//             <Typography variant="h6">Pending Recruiter Approvals</Typography>
+//             {pendingRecruiters.length > 0 && (
+//               <Chip
+//                 label={pendingRecruiters.length}
+//                 size="small"
+//                 sx={{ bgcolor: alpha("#f59e0b", 0.15), color: "#f59e0b", fontWeight: 700 }}
+//               />
+//             )}
+//           </Stack>
+
+//           {pendingLoading ? (
+//             <Stack alignItems="center" py={3}><CircularProgress size={24} /></Stack>
+//           ) : (
+//             <Stack spacing={1.5}>
+//               {pendingRecruiters.map((recruiter) => (
+//                 <Box
+//                   key={recruiter._id}
+//                   sx={{
+//                     display: "flex", alignItems: "center", gap: 2,
+//                     p: 2, borderRadius: 2,
+//                     border: "1px solid #e5e7eb",
+//                     bgcolor: "#ffffff",
+//                     flexWrap: { xs: "wrap", sm: "nowrap" },
+//                   }}
+//                 >
+//                   <Avatar sx={{ bgcolor: "#fef3c7", color: "#d97706", fontWeight: 700, flexShrink: 0 }}>
+//                     {recruiter.name[0].toUpperCase()}
+//                   </Avatar>
+
+//                   <Box sx={{ flex: 1, minWidth: 0 }}>
+//                     <Typography variant="body2" sx={{ fontWeight: 600 }}>{recruiter.name}</Typography>
+//                     <Typography variant="caption" color="text.secondary">{recruiter.email}</Typography>
+//                     {recruiter.phone && (
+//                       <Typography variant="caption" color="text.disabled" display="block">
+//                         {recruiter.phone}
+//                       </Typography>
+//                     )}
+//                     <Typography variant="caption" color="text.disabled" display="block">
+//                       Registered {timeAgo(recruiter.createdAt)}
+//                     </Typography>
+//                   </Box>
+
+//                   <Stack direction="row" spacing={1} flexShrink={0}>
+//                     <Button
+//                       size="small"
+//                       variant="contained"
+//                       color="success"
+//                       startIcon={
+//                         reviewingId === recruiter._id
+//                           ? <CircularProgress size={14} color="inherit" />
+//                           : <CheckCircleIcon fontSize="small" />
+//                       }
+//                       disabled={reviewingId === recruiter._id}
+//                       onClick={() => handleReview(recruiter._id, "approve")}
+//                       sx={{ minWidth: 100 }}
+//                     >
+//                       Approve
+//                     </Button>
+//                     <Button
+//                       size="small"
+//                       variant="outlined"
+//                       color="error"
+//                       startIcon={
+//                         reviewingId === recruiter._id
+//                           ? <CircularProgress size={14} color="inherit" />
+//                           : <CancelIcon fontSize="small" />
+//                       }
+//                       disabled={reviewingId === recruiter._id}
+//                       onClick={() => handleReview(recruiter._id, "reject")}
+//                       sx={{ minWidth: 90 }}
+//                     >
+//                       Reject
+//                     </Button>
+//                   </Stack>
+//                 </Box>
+//               ))}
+//             </Stack>
+//           )}
+//         </Card>
+//       )}
+
+//       {/* Tabs: Users | Applications */}
+//       <Card sx={{ p: 3 }}>
+//         <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)}
+//           sx={{ mb: 3, borderBottom: "1px solid", borderColor: "divider" }}>
+//           <Tab label={
+//             <Stack direction="row" spacing={1} alignItems="center">
+//               <PeopleAltIcon sx={{ fontSize: 16 }} /><span>Users</span>
+//               {stats && <Badge badgeContent={stats.totalUsers} max={9999} color="primary"
+//                 sx={{ "& .MuiBadge-badge": { fontSize: "0.65rem", height: 16, minWidth: 16 } }} />}
+//             </Stack>
+//           } />
+//           <Tab label={
+//             <Stack direction="row" spacing={1} alignItems="center">
+//               <AssignmentIcon sx={{ fontSize: 16 }} /><span>Applications</span>
+//               {stats && <Badge badgeContent={stats.totalApplications} max={9999} color="primary"
+//                 sx={{ "& .MuiBadge-badge": { fontSize: "0.65rem", height: 16, minWidth: 16 } }} />}
+//             </Stack>
+//           } />
+//         </Tabs>
+
+//         {activeTab === 0 && <UsersTab onStatsRefresh={loadStats} />}
+//         {activeTab === 1 && <ApplicationsTab />}
+//       </Card>
+//     </Container>
+//   );
+// }
+
+
+
+
 import { useState, useEffect, useCallback } from "react";
 import {
   Container, Grid, Card, Typography, Stack, Button, Box, Tab, Tabs,
-  Badge, Avatar, Chip, CircularProgress, Alert,
+  Badge, Avatar, Chip, CircularProgress,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
@@ -215,12 +497,15 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
+import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAuth } from "../../pages/signin/lib/auth";
 import {
   fetchAdminDashboard, IAdminDashboardStats,
-  fetchPendingRecruiters, reviewRecruiter, IUser, // âœ… new imports
+  fetchPendingRecruiters, reviewRecruiter,
+  fetchPendingSeekers, reviewSeeker,
+  IUser,
 } from "./services/admin-api";
 import { useToast } from "../../hooks/useToast";
 import { StatCard, PipelineCard, UserRoleCard } from "./components/DashboardCards";
@@ -238,10 +523,15 @@ export default function AdminDashboard() {
   const [statsLoading, setStatsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
 
-  // âœ… Pending recruiters state
+  // Pending recruiters
   const [pendingRecruiters, setPendingRecruiters] = useState<IUser[]>([]);
-  const [pendingLoading, setPendingLoading] = useState(false);
-  const [reviewingId, setReviewingId] = useState<string | null>(null);
+  const [pendingRecruitersLoading, setPendingRecruitersLoading] = useState(false);
+  const [reviewingRecruiterId, setReviewingRecruiterId] = useState<string | null>(null);
+
+  // Pending seekers
+  const [pendingSeekers, setPendingSeekers] = useState<IUser[]>([]);
+  const [pendingSeekersLoading, setPendingSeekersLoading] = useState(false);
+  const [reviewingSeekerId, setReviewingSeekerId] = useState<string | null>(null);
 
   const loadStats = useCallback(async () => {
     setStatsLoading(true);
@@ -255,82 +545,220 @@ export default function AdminDashboard() {
     }
   }, [toast]);
 
-  // âœ… Load pending recruiters
   const loadPendingRecruiters = useCallback(async () => {
-    setPendingLoading(true);
+    setPendingRecruitersLoading(true);
     try {
       const res = await fetchPendingRecruiters();
       setPendingRecruiters(res.items);
     } catch (err) {
       toast.error(getErrorMessage(err, "Failed to load pending recruiters."));
     } finally {
-      setPendingLoading(false);
+      setPendingRecruitersLoading(false);
+    }
+  }, [toast]);
+
+  const loadPendingSeekers = useCallback(async () => {
+    setPendingSeekersLoading(true);
+    try {
+      const res = await fetchPendingSeekers();
+      setPendingSeekers(res.items);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Failed to load pending job seekers."));
+    } finally {
+      setPendingSeekersLoading(false);
     }
   }, [toast]);
 
   useEffect(() => {
     loadStats();
     loadPendingRecruiters();
-  }, [loadStats, loadPendingRecruiters]);
+    loadPendingSeekers();
+  }, [loadStats, loadPendingRecruiters, loadPendingSeekers]);
 
-  // âœ… Approve or reject a recruiter
-  async function handleReview(userId: string, action: "approve" | "reject") {
-    setReviewingId(userId);
+  async function handleReviewRecruiter(userId: string, action: "approve" | "reject") {
+    setReviewingRecruiterId(userId);
     try {
       await reviewRecruiter(userId, action);
       toast.success(
         action === "approve"
-          ? "Recruiter approved â€” they can now log in."
+          ? "Recruiter approved — they can now log in."
           : "Recruiter application rejected."
       );
-      // Remove from pending list
       setPendingRecruiters((prev) => prev.filter((r) => r._id !== userId));
-      loadStats(); // refresh totals
+      loadStats();
     } catch (err) {
       toast.error(getErrorMessage(err, `Failed to ${action} recruiter.`));
     } finally {
-      setReviewingId(null);
+      setReviewingRecruiterId(null);
+    }
+  }
+
+  async function handleReviewSeeker(userId: string, action: "approve" | "reject") {
+    setReviewingSeekerId(userId);
+    try {
+      await reviewSeeker(userId, action);
+      toast.success(
+        action === "approve"
+          ? "Job seeker approved — they can now log in."
+          : "Job seeker application rejected."
+      );
+      setPendingSeekers((prev) => prev.filter((s) => s._id !== userId));
+      loadStats();
+    } catch (err) {
+      toast.error(getErrorMessage(err, `Failed to ${action} job seeker.`));
+    } finally {
+      setReviewingSeekerId(null);
     }
   }
 
   const statCards = [
     {
       label: "Total Users",
-      value: stats?.totalUsers ?? "â€“",
+      value: stats?.totalUsers ?? "—",
       icon: <PeopleAltIcon />,
       color: "#60a5fa",
-      sub: stats ? `${stats.usersByRole.recruiter} recruiters Â· ${stats.usersByRole.job_seeker} seekers` : undefined,
+      sub: stats
+        ? `${stats.usersByRole.recruiter} recruiters · ${stats.usersByRole.job_seeker} seekers`
+        : undefined,
     },
     {
       label: "Total Jobs",
-      value: stats?.totalJobs ?? "â€“",
+      value: stats?.totalJobs ?? "—",
       icon: <WorkIcon />,
       color: "#10b981",
-      sub: stats ? `${stats.jobsByStatus.open} open Â· ${stats.jobsByStatus.draft} draft` : undefined,
+      sub: stats
+        ? `${stats.jobsByStatus.open} open · ${stats.jobsByStatus.draft} draft`
+        : undefined,
     },
     {
       label: "Applications",
-      value: stats?.totalApplications ?? "â€“",
+      value: stats?.totalApplications ?? "—",
       icon: <AssignmentIcon />,
       color: "#a78bfa",
       sub: stats ? `${stats.applicationsByStatus.shortlisted} shortlisted` : undefined,
     },
     {
       label: "Hired",
-      value: stats?.applicationsByStatus.hired ?? "â€“",
+      value: stats?.applicationsByStatus.hired ?? "—",
       icon: <TrendingUpIcon />,
       color: "#f472b6",
-      sub: stats && stats.totalApplications > 0
-        ? `${Math.round((stats.applicationsByStatus.hired / stats.totalApplications) * 100)}% conversion`
-        : stats ? "0% conversion" : undefined,
+      sub:
+        stats && stats.totalApplications > 0
+          ? `${Math.round(
+              (stats.applicationsByStatus.hired / stats.totalApplications) * 100
+            )}% conversion`
+          : stats
+          ? "0% conversion"
+          : undefined,
     },
   ];
+
+  // ── Reusable pending-user card row ────────────────────────────────────────
+  function PendingUserRow({
+    person,
+    reviewingId,
+    avatarColor,
+    onApprove,
+    onReject,
+  }: {
+    person: IUser;
+    reviewingId: string | null;
+    avatarColor: { bg: string; text: string };
+    onApprove: () => void;
+    onReject: () => void;
+  }) {
+    const busy = reviewingId === person._id;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+          p: 2,
+          borderRadius: 2,
+          border: "1px solid #e5e7eb",
+          bgcolor: "#ffffff",
+          flexWrap: { xs: "wrap", sm: "nowrap" },
+        }}
+      >
+        <Avatar
+          sx={{
+            bgcolor: avatarColor.bg,
+            color: avatarColor.text,
+            fontWeight: 700,
+            flexShrink: 0,
+          }}
+        >
+          {person.name[0].toUpperCase()}
+        </Avatar>
+
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            {person.name}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {person.email}
+          </Typography>
+          {person.phone && (
+            <Typography variant="caption" color="text.disabled" display="block">
+              {person.phone}
+            </Typography>
+          )}
+          <Typography variant="caption" color="text.disabled" display="block">
+            Registered {timeAgo(person.createdAt)}
+          </Typography>
+        </Box>
+
+        <Stack direction="row" spacing={1} flexShrink={0}>
+          <Button
+            size="small"
+            variant="contained"
+            color="success"
+            startIcon={
+              busy ? (
+                <CircularProgress size={14} color="inherit" />
+              ) : (
+                <CheckCircleIcon fontSize="small" />
+              )
+            }
+            disabled={busy}
+            onClick={onApprove}
+            sx={{ minWidth: 100 }}
+          >
+            Approve
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            color="error"
+            startIcon={
+              busy ? (
+                <CircularProgress size={14} color="inherit" />
+              ) : (
+                <CancelIcon fontSize="small" />
+              )
+            }
+            disabled={busy}
+            onClick={onReject}
+            sx={{ minWidth: 90 }}
+          >
+            Reject
+          </Button>
+        </Stack>
+      </Box>
+    );
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
       {/* Header */}
-      <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between"
-        alignItems={{ sm: "center" }} spacing={2} sx={{ mb: 4 }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ sm: "center" }}
+        spacing={2}
+        sx={{ mb: 4 }}
+      >
         <Box>
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.25 }}>
             <AdminPanelSettingsIcon sx={{ color: "#7c3aed", fontSize: 18 }} />
@@ -342,11 +770,20 @@ export default function AdminDashboard() {
             Welcome, {user?.name?.split(" ")[0]}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Full platform oversight â€” users, jobs, and applications
+            Full platform oversight — users, jobs, and applications
           </Typography>
         </Box>
-        <Button variant="outlined" size="small" startIcon={<RefreshIcon />}
-          onClick={() => { loadStats(); loadPendingRecruiters(); }} disabled={statsLoading}>
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<RefreshIcon />}
+          onClick={() => {
+            loadStats();
+            loadPendingRecruiters();
+            loadPendingSeekers();
+          }}
+          disabled={statsLoading}
+        >
           Refresh stats
         </Button>
       </Stack>
@@ -354,23 +791,44 @@ export default function AdminDashboard() {
       {/* Stat cards */}
       <Grid container spacing={2.5} sx={{ mb: 4 }}>
         {statsLoading
-          ? [0, 1, 2, 3].map((i) => <Grid item xs={6} md={3} key={i}><StatCardSkeleton /></Grid>)
+          ? [0, 1, 2, 3].map((i) => (
+              <Grid item xs={6} md={3} key={i}>
+                <StatCardSkeleton />
+              </Grid>
+            ))
           : statCards.map((s) => (
-            <Grid item xs={6} md={3} key={s.label}>
-              <StatCard label={s.label} value={s.value} icon={s.icon} color={s.color} sub={s.sub} />
-            </Grid>
-          ))}
+              <Grid item xs={6} md={3} key={s.label}>
+                <StatCard
+                  label={s.label}
+                  value={s.value}
+                  icon={s.icon}
+                  color={s.color}
+                  sub={s.sub}
+                />
+              </Grid>
+            ))}
       </Grid>
 
       {/* Charts row */}
       <Grid container spacing={2.5} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={7}><PipelineCard stats={stats} loading={statsLoading} /></Grid>
-        <Grid item xs={12} md={5}><UserRoleCard stats={stats} loading={statsLoading} /></Grid>
+        <Grid item xs={12} md={7}>
+          <PipelineCard stats={stats} loading={statsLoading} />
+        </Grid>
+        <Grid item xs={12} md={5}>
+          <UserRoleCard stats={stats} loading={statsLoading} />
+        </Grid>
       </Grid>
 
-      {/* âœ… Pending Recruiters section â€” shown only when there are pending requests */}
-      {(pendingLoading || pendingRecruiters.length > 0) && (
-        <Card sx={{ p: 3, mb: 3, border: `1px solid ${alpha("#f59e0b", 0.3)}`, bgcolor: alpha("#f59e0b", 0.03) }}>
+      {/* Pending Recruiter Approvals */}
+      {(pendingRecruitersLoading || pendingRecruiters.length > 0) && (
+        <Card
+          sx={{
+            p: 3,
+            mb: 3,
+            border: `1px solid ${alpha("#f59e0b", 0.3)}`,
+            bgcolor: alpha("#f59e0b", 0.03),
+          }}
+        >
           <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
             <HourglassTopIcon sx={{ color: "#f59e0b", fontSize: 20 }} />
             <Typography variant="h6">Pending Recruiter Approvals</Typography>
@@ -378,76 +836,77 @@ export default function AdminDashboard() {
               <Chip
                 label={pendingRecruiters.length}
                 size="small"
-                sx={{ bgcolor: alpha("#f59e0b", 0.15), color: "#f59e0b", fontWeight: 700 }}
+                sx={{
+                  bgcolor: alpha("#f59e0b", 0.15),
+                  color: "#f59e0b",
+                  fontWeight: 700,
+                }}
               />
             )}
           </Stack>
 
-          {pendingLoading ? (
-            <Stack alignItems="center" py={3}><CircularProgress size={24} /></Stack>
+          {pendingRecruitersLoading ? (
+            <Stack alignItems="center" py={3}>
+              <CircularProgress size={24} />
+            </Stack>
           ) : (
             <Stack spacing={1.5}>
               {pendingRecruiters.map((recruiter) => (
-                <Box
+                <PendingUserRow
                   key={recruiter._id}
-                  sx={{
-                    display: "flex", alignItems: "center", gap: 2,
-                    p: 2, borderRadius: 2,
-                    border: "1px solid #e5e7eb",
-                    bgcolor: "#ffffff",
-                    flexWrap: { xs: "wrap", sm: "nowrap" },
-                  }}
-                >
-                  <Avatar sx={{ bgcolor: "#fef3c7", color: "#d97706", fontWeight: 700, flexShrink: 0 }}>
-                    {recruiter.name[0].toUpperCase()}
-                  </Avatar>
+                  person={recruiter}
+                  reviewingId={reviewingRecruiterId}
+                  avatarColor={{ bg: "#fef3c7", text: "#d97706" }}
+                  onApprove={() => handleReviewRecruiter(recruiter._id, "approve")}
+                  onReject={() => handleReviewRecruiter(recruiter._id, "reject")}
+                />
+              ))}
+            </Stack>
+          )}
+        </Card>
+      )}
 
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{recruiter.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">{recruiter.email}</Typography>
-                    {recruiter.phone && (
-                      <Typography variant="caption" color="text.disabled" display="block">
-                        {recruiter.phone}
-                      </Typography>
-                    )}
-                    <Typography variant="caption" color="text.disabled" display="block">
-                      Registered {timeAgo(recruiter.createdAt)}
-                    </Typography>
-                  </Box>
+      {/* Pending Job Seeker Approvals */}
+      {(pendingSeekersLoading || pendingSeekers.length > 0) && (
+        <Card
+          sx={{
+            p: 3,
+            mb: 3,
+            border: `1px solid ${alpha("#06b6d4", 0.3)}`,
+            bgcolor: alpha("#06b6d4", 0.03),
+          }}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+            <PersonSearchIcon sx={{ color: "#06b6d4", fontSize: 20 }} />
+            <Typography variant="h6">Pending Job Seeker Approvals</Typography>
+            {pendingSeekers.length > 0 && (
+              <Chip
+                label={pendingSeekers.length}
+                size="small"
+                sx={{
+                  bgcolor: alpha("#06b6d4", 0.15),
+                  color: "#06b6d4",
+                  fontWeight: 700,
+                }}
+              />
+            )}
+          </Stack>
 
-                  <Stack direction="row" spacing={1} flexShrink={0}>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="success"
-                      startIcon={
-                        reviewingId === recruiter._id
-                          ? <CircularProgress size={14} color="inherit" />
-                          : <CheckCircleIcon fontSize="small" />
-                      }
-                      disabled={reviewingId === recruiter._id}
-                      onClick={() => handleReview(recruiter._id, "approve")}
-                      sx={{ minWidth: 100 }}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="error"
-                      startIcon={
-                        reviewingId === recruiter._id
-                          ? <CircularProgress size={14} color="inherit" />
-                          : <CancelIcon fontSize="small" />
-                      }
-                      disabled={reviewingId === recruiter._id}
-                      onClick={() => handleReview(recruiter._id, "reject")}
-                      sx={{ minWidth: 90 }}
-                    >
-                      Reject
-                    </Button>
-                  </Stack>
-                </Box>
+          {pendingSeekersLoading ? (
+            <Stack alignItems="center" py={3}>
+              <CircularProgress size={24} />
+            </Stack>
+          ) : (
+            <Stack spacing={1.5}>
+              {pendingSeekers.map((seeker) => (
+                <PendingUserRow
+                  key={seeker._id}
+                  person={seeker}
+                  reviewingId={reviewingSeekerId}
+                  avatarColor={{ bg: "#cffafe", text: "#0891b2" }}
+                  onApprove={() => handleReviewSeeker(seeker._id, "approve")}
+                  onReject={() => handleReviewSeeker(seeker._id, "reject")}
+                />
               ))}
             </Stack>
           )}
@@ -456,22 +915,55 @@ export default function AdminDashboard() {
 
       {/* Tabs: Users | Applications */}
       <Card sx={{ p: 3 }}>
-        <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)}
-          sx={{ mb: 3, borderBottom: "1px solid", borderColor: "divider" }}>
-          <Tab label={
-            <Stack direction="row" spacing={1} alignItems="center">
-              <PeopleAltIcon sx={{ fontSize: 16 }} /><span>Users</span>
-              {stats && <Badge badgeContent={stats.totalUsers} max={9999} color="primary"
-                sx={{ "& .MuiBadge-badge": { fontSize: "0.65rem", height: 16, minWidth: 16 } }} />}
-            </Stack>
-          } />
-          <Tab label={
-            <Stack direction="row" spacing={1} alignItems="center">
-              <AssignmentIcon sx={{ fontSize: 16 }} /><span>Applications</span>
-              {stats && <Badge badgeContent={stats.totalApplications} max={9999} color="primary"
-                sx={{ "& .MuiBadge-badge": { fontSize: "0.65rem", height: 16, minWidth: 16 } }} />}
-            </Stack>
-          } />
+        <Tabs
+          value={activeTab}
+          onChange={(_, v) => setActiveTab(v)}
+          sx={{ mb: 3, borderBottom: "1px solid", borderColor: "divider" }}
+        >
+          <Tab
+            label={
+              <Stack direction="row" spacing={1} alignItems="center">
+                <PeopleAltIcon sx={{ fontSize: 16 }} />
+                <span>Users</span>
+                {stats && (
+                  <Badge
+                    badgeContent={stats.totalUsers}
+                    max={9999}
+                    color="primary"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: "0.65rem",
+                        height: 16,
+                        minWidth: 16,
+                      },
+                    }}
+                  />
+                )}
+              </Stack>
+            }
+          />
+          <Tab
+            label={
+              <Stack direction="row" spacing={1} alignItems="center">
+                <AssignmentIcon sx={{ fontSize: 16 }} />
+                <span>Applications</span>
+                {stats && (
+                  <Badge
+                    badgeContent={stats.totalApplications}
+                    max={9999}
+                    color="primary"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: "0.65rem",
+                        height: 16,
+                        minWidth: 16,
+                      },
+                    }}
+                  />
+                )}
+              </Stack>
+            }
+          />
         </Tabs>
 
         {activeTab === 0 && <UsersTab onStatsRefresh={loadStats} />}

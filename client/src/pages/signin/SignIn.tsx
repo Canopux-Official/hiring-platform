@@ -194,10 +194,10 @@ export default function SignIn() {
 
   const onField =
     (key: keyof FormState) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setForm((prev) => ({ ...prev, [key]: e.target.value }));
-      setErr("");
-    };
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((prev) => ({ ...prev, [key]: e.target.value }));
+        setErr("");
+      };
 
   const goToRole = () => {
     setStep("role");
@@ -229,9 +229,9 @@ export default function SignIn() {
     setSubmitting(true);
     try {
       const result = await signIn(form.email, form.password, role);
-      if (!result.ok) { 
-        setErr(result.error ?? "Sign in failed."); 
-        return; 
+      if (!result.ok) {
+        setErr(result.error ?? "Sign in failed.");
+        return;
       }
       nav(roleHome(role), { replace: true });
     } finally {
@@ -243,20 +243,20 @@ export default function SignIn() {
     e.preventDefault();
     setErr("");
 
-    if (form.name.trim().length < 2) { 
-      setErr("Name must be at least 2 characters."); 
-      return; 
+    if (form.name.trim().length < 2) {
+      setErr("Name must be at least 2 characters.");
+      return;
     }
-    
+
     const pwdErr = validatePassword(form.password);
-    if (pwdErr) { 
-      setErr(pwdErr); 
-      return; 
+    if (pwdErr) {
+      setErr(pwdErr);
+      return;
     }
-    
-    if (form.password !== form.confirmPassword) { 
-      setErr("Passwords do not match."); 
-      return; 
+
+    if (form.password !== form.confirmPassword) {
+      setErr("Passwords do not match.");
+      return;
     }
 
     setSubmitting(true);
@@ -274,12 +274,12 @@ export default function SignIn() {
         return;
       }
 
-      // Recruiter pending approval — return flag to RegisterForm
+      // Both recruiters AND job seekers now require admin approval
       if (result.pendingApproval) {
         return { pendingApproval: true };
       }
 
-      // Normal flow (job seeker) — navigate to dashboard
+      // Only admin role goes straight to dashboard (no approval needed)
       nav(roleHome(role), { replace: true });
     } finally {
       setSubmitting(false);

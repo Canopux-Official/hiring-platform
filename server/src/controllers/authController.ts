@@ -164,8 +164,8 @@
 //     next(err);
 //   }
 // };
-  
- import { Response, NextFunction } from "express";
+
+import { Response, NextFunction } from "express";
 import { AuthenticatedRequest, RecruiterApprovalStatus } from "../types";
 import User from "../models/User";
 import JobSeekerProfile from "../models/JobSeekerProfile";
@@ -191,23 +191,26 @@ export const register = async (
     }
 
     const isRecruiter = role === "recruiter";
+    const isJobSeeker = role === "job_seeker";
+    const requiresApproval = isRecruiter || isJobSeeker;
+
     const user = await User.create({
       name,
       email,
       password,
       role,
       phone,
-      isActive: !isRecruiter,
-      approvalStatus: isRecruiter
+      isActive: !requiresApproval,
+      approvalStatus: requiresApproval
         ? RecruiterApprovalStatus.PENDING
         : null,
     });
 
-    if (user.role === "job_seeker") {
+    if (isJobSeeker) {
       await JobSeekerProfile.create({ user: user._id });
     }
 
-    if (isRecruiter) {
+    if (requiresApproval) {
       res.status(201).json(
         successResponse(
           "Registration successful. Your account is pending admin approval. You will be able to login once approved.",
@@ -246,13 +249,12 @@ export const login = async (
       return next(new AppError("Invalid email or password.", 401));
     }
 
+    // Recruiter approval checks
     if (
       user.role === "recruiter" &&
       user.approvalStatus === RecruiterApprovalStatus.PENDING
     ) {
-      return next(
-        new AppError("Your account is pending admin approval.", 403)
-      );
+      return next(new AppError("Your account is pending admin approval.", 403));
     }
 
     if (
@@ -261,6 +263,23 @@ export const login = async (
     ) {
       return next(
         new AppError("Your recruiter application was rejected. Contact support.", 403)
+      );
+    }
+
+    // Job seeker approval checks
+    if (
+      user.role === "job_seeker" &&
+      user.approvalStatus === RecruiterApprovalStatus.PENDING
+    ) {
+      return next(new AppError("Your account is pending admin approval.", 403));
+    }
+
+    if (
+      user.role === "job_seeker" &&
+      user.approvalStatus === RecruiterApprovalStatus.REJECTED
+    ) {
+      return next(
+        new AppError("Your account was rejected by admin. Contact support.", 403)
       );
     }
 
@@ -277,6 +296,7 @@ export const login = async (
     next(err);
   }
 };
+
 
 // ─── Logout ───────────────────────────────────────────────────────────────────
 export const logout = (_req: AuthenticatedRequest, res: Response): void => {

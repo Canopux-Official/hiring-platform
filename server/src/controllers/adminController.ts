@@ -398,3 +398,74 @@ export const adminDeleteApplication = async (
     next(err);
   }
 };
+
+
+
+
+// ─── Get Pending Job Seekers ──────────────────────────────────────────────────
+export const getPendingSeekers = async (
+  _req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const pendingSeekers = await User.find({
+      role: Role.JOB_SEEKER,
+      approvalStatus: RecruiterApprovalStatus.PENDING,
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json(
+      successResponse("Pending job seekers fetched", {
+        items: pendingSeekers,
+        total: pendingSeekers.length,
+      })
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Approve or Reject Job Seeker ─────────────────────────────────────────────
+export const reviewSeeker = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { action } = req.body; // "approve" | "reject"
+
+    if (!["approve", "reject"].includes(action)) {
+      return next(new AppError("Action must be 'approve' or 'reject'.", 400));
+    }
+
+    const user = await User.findOne({
+      _id: req.params.id,
+      role: Role.JOB_SEEKER,
+    });
+
+    if (!user) return next(new AppError("Job seeker not found.", 404));
+
+    if (user.approvalStatus !== RecruiterApprovalStatus.PENDING) {
+      return next(new AppError("This job seeker has already been reviewed.", 400));
+    }
+
+    if (action === "approve") {
+      user.approvalStatus = RecruiterApprovalStatus.APPROVED;
+      user.isActive = true;
+    } else {
+      user.approvalStatus = RecruiterApprovalStatus.REJECTED;
+      user.isActive = false;
+    }
+
+    await user.save();
+
+    res.status(200).json(
+      successResponse(
+        `Job seeker ${action === "approve" ? "approved" : "rejected"} successfully`,
+        { approvalStatus: user.approvalStatus, isActive: user.isActive }
+      )
+    );
+  } catch (err) {
+    next(err);
+  }
+};

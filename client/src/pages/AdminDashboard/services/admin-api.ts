@@ -388,3 +388,32 @@ export async function adminDeleteApplication(
     { withCredentials: true }
   );
 }
+
+
+
+
+// ─── Seeker Approval ──────────────────────────────────────────────────────────
+
+export interface PendingSeekersResult {
+  items: IUser[];
+  total: number;
+}
+
+export async function fetchPendingSeekers(): Promise<PendingSeekersResult> {
+  const { data } = await axios.get(`${BASE}/admin/seekers/pending`, {
+    withCredentials: true,
+  });
+  return data.data;
+}
+
+export async function reviewSeeker(
+  userId: string,
+  action: "approve" | "reject"
+): Promise<{ approvalStatus: string; isActive: boolean }> {
+  const { data } = await axios.patch(
+    `${BASE}/admin/seekers/${userId}/review`,
+    { action },
+    { withCredentials: true }
+  );
+  return data.data;
+}

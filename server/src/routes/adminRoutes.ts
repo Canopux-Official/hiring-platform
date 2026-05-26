@@ -7,11 +7,13 @@ import {
   deleteUser,
   reviewRecruiter,
   getPendingRecruiters,
-  getRecruiterJobs,       
-  adminUpdateJob,        
-  adminDeleteJob,         
-  getSeekerApplications,  
-  adminDeleteApplication, 
+  getRecruiterJobs,
+  adminUpdateJob,
+  adminDeleteJob,
+  getSeekerApplications,
+  adminDeleteApplication,
+  getPendingSeekers,   // ← new
+  reviewSeeker,        // ← new
 } from "../controllers/adminController";
 import { authenticate, authorize } from "../middleware/auth";
 import { Role } from "../types";
@@ -40,5 +42,11 @@ router.delete("/recruiters/:recruiterId/jobs/:jobId", adminDeleteJob);
 // Job seeker detail view
 router.get("/seekers/:seekerId/applications", getSeekerApplications);
 router.delete("/seekers/:seekerId/applications/:applicationId", adminDeleteApplication);
+
+
+// Job seeker approval routes
+router.get("/seekers/pending", getPendingSeekers);
+router.patch("/seekers/:id/review", reviewSeeker);
+
 
 export default router;
