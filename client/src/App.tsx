@@ -13,6 +13,7 @@ import SignIn from "./pages/signin/SignIn";
 import SeekerDashboard from "./pages/seeker/SeekerDashboard";
 import Jobs from "./pages/jobs/Jobs";
 import AboutPage from "./pages/About";
+import PricingPage from "./pages/Pricing";
 
 // ─── Role-based redirect helper ────────────────────────────────────────────────
 
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/pricing" element={<PricingPage />} />
 
             {/* Protected — Recruiter */}
             <Route

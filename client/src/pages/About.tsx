@@ -25,7 +25,7 @@ const founderData = {
   name: "Ragas S",
   title: "Founder",
   subtitle: "Global Talent Acquisition Leader · International Recruitment Specialist · Campus & Corporate Hiring Expert",
-  initials: "AM",
+  initials: "RS",
   accentColor: "#059669",
   accentBg: "#d1fae5",
   bio: "Highly experienced HR & Talent Acquisition Professional with 18+ years of expertise in international and domestic hiring across multiple industries and global markets. Specialised in large-scale recruitment operations, strategic workforce planning, campus hiring, executive search, and multinational recruitment partnerships. Successfully managed hiring projects for MNCs, corporate organisations, startups, and international clients — delivering high-quality talent acquisition solutions with strong industry knowledge and professional recruitment strategies.",

@@ -15,6 +15,7 @@ import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import { useAuth } from "../pages/signin/lib/auth";
 import { alpha } from "@mui/material/styles";
 import logo from '../assets/logo.png'
+import SellOutlinedIcon from "@mui/icons-material/SellOutlined";
 
 // ── Design Tokens (Same as Hero) ─────────────────────────────────────
 const GREEN = "#059669";
@@ -29,6 +30,7 @@ const SIDEBAR_HOVER = alpha(GREEN, 0.15);
 const navLinks = [
   { to: "/jobs", label: "Find Jobs", icon: <WorkOutlineIcon sx={{ fontSize: 20 }} /> },
   { to: "/about", label: "About", icon: <PeopleOutlineIcon sx={{ fontSize: 20 }} /> },
+  { to: "/pricing", label: "Pricing", icon: <SellOutlinedIcon sx={{ fontSize: 20 }} /> }
 ];
 
 export default function SiteNav() {
@@ -300,26 +302,7 @@ export default function SiteNav() {
             >
               Sign In
             </Button>
-            <Button
-              fullWidth
-              variant="contained"
-              component={RouterLink}
-              to="/signin"
-              onClick={onClose}
-              sx={{
-                py: 1.4,
-                fontSize: 14.5,
-                fontWeight: 700,
-                borderRadius: 2.5,
-                background: `linear-gradient(135deg, ${GREEN} 0%, ${GREEN_DARK} 100%)`,
-                boxShadow: `0 4px 16px ${alpha(GREEN, 0.4)}`,
-                "&:hover": {
-                  background: `linear-gradient(135deg, ${GREEN_DARK}, #065f46)`,
-                },
-              }}
-            >
-              Get Started Free
-            </Button>
+
           </Stack>
         )}
       </Box>
@@ -369,12 +352,19 @@ export default function SiteNav() {
               width: 34,
               height: 34,
               borderRadius: "10px",
-              background: `linear-gradient(135deg, ${GREEN}, ${BLUE})`,
               display: "grid",
               placeItems: "center",
             }}
           >
-            <HubOutlinedIcon sx={{ color: "#ffffff", fontSize: 19 }} />
+            <img
+              src={logo}
+              alt="RagasHire"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+            />
           </Box>
           <Typography sx={{ fontWeight: 800, fontSize: 17, color: "#ffffff" }}>
             RagasHire
