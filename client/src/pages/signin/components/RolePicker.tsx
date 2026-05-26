@@ -1,4 +1,4 @@
-﻿// // components/SignIn/RolePicker.tsx
+﻿
 
 // import {
 //   Box,
@@ -14,6 +14,13 @@
 // import { motion } from "framer-motion";
 // import { alpha } from "@mui/material/styles";
 // import { AuthStep, Role, RoleOption } from "../types/auth.types";
+
+// // ── Design Tokens (Consistent with Hero) ─────────────────────────────
+// const GREEN = "#059669";
+// const GREEN_DARK = "#047857";
+// const GREEN_LIGHT = "#d1fae5";
+// const BLUE = "#2563eb";
+// const BLUE_LIGHT = "#dbeafe";
 
 // interface Props {
 //   onPick: (role: Role, step: AuthStep) => void;
@@ -47,7 +54,11 @@
 // };
 
 // function accentColor(role: Role): string {
-//   return role === "admin" ? "#f472b6" : "#7c3aed";
+//   return role === "admin" ? BLUE : GREEN;   // Admin gets blue accent
+// }
+
+// function accentLight(role: Role): string {
+//   return role === "admin" ? BLUE_LIGHT : GREEN_LIGHT;
 // }
 
 // export default function RolePicker({ onPick }: Props) {
@@ -58,11 +69,20 @@
 //       animate={{ opacity: 1, y: 0 }}
 //       exit={{ opacity: 0, y: -20 }}
 //     >
-//       <Box sx={{ textAlign: "center", mb: 5 }}>
-//         <Typography variant="h2" sx={{ fontSize: { xs: 32, md: 48 }, mb: 1 }}>
+//       <Box sx={{ textAlign: "center", mb: 6 }}>
+//         <Typography 
+//           variant="h2" 
+//           sx={{ 
+//             fontSize: { xs: 32, md: 48 }, 
+//             mb: 1.5, 
+//             fontWeight: 800, 
+//             color: "#0f172a",
+//             letterSpacing: "-0.03em"
+//           }}
+//         >
 //           Welcome to RagasHire
 //         </Typography>
-//         <Typography color="text.secondary">
+//         <Typography color="text.secondary" sx={{ fontSize: 17.5 }}>
 //           Choose how you'd like to use the platform
 //         </Typography>
 //       </Box>
@@ -77,64 +97,91 @@
 //           >
 //             <Card
 //               sx={{
-//                 p: 4,
+//                 p: 4.5,
 //                 cursor: "pointer",
 //                 height: "100%",
-//                 transition: "all 0.3s",
+//                 transition: "all 0.3s ease",
+//                 border: `1px solid ${alpha(accentColor(opt.value), 0.15)}`,
+//                 "&:hover": {
+//                   transform: "translateY(-8px)",
+//                   borderColor: alpha(accentColor(opt.value), 0.5),
+//                   boxShadow: `0 20px 50px -15px ${alpha(accentColor(opt.value), 0.25)}`,
+//                 },
 //                 ...(opt.value === "admin" && {
-//                   borderColor: alpha("#f472b6", 0.2),
-//                   maxWidth: { md: 400 },
+//                   maxWidth: { md: 420 },
 //                   mx: "auto",
 //                 }),
-//                 "&:hover": {
-//                   transform: "translateY(-6px)",
-//                   borderColor: alpha(accentColor(opt.value), 0.5),
-//                   boxShadow: `0 0 60px -10px ${alpha(accentColor(opt.value), 0.4)}`,
-//                 },
 //               }}
 //             >
 //               <Box
 //                 sx={{
-//                   width: 72,
-//                   height: 72,
+//                   width: 78,
+//                   height: 78,
 //                   borderRadius: 3,
-//                   mb: 3,
-//                   bgcolor: alpha(accentColor(opt.value), 0.12),
-//                   color:
-//                     opt.value === "admin" ? "#f472b6" : "primary.main",
+//                   mb: 3.5,
+//                   bgcolor: accentLight(opt.value),
+//                   color: accentColor(opt.value),
 //                   display: "grid",
 //                   placeItems: "center",
+//                   boxShadow: `0 4px 12px ${alpha(accentColor(opt.value), 0.15)}`,
 //                 }}
 //               >
 //                 {ROLE_ICONS[opt.value]}
 //               </Box>
-//               <Typography variant="h5" sx={{ mb: 1 }}>
+
+//               <Typography 
+//                 variant="h5" 
+//                 sx={{ mb: 1.5, fontWeight: 700, color: "#0f172a" }}
+//               >
 //                 {opt.title}
 //               </Typography>
-//               <Typography color="text.secondary" sx={{ mb: 3 }}>
+
+//               <Typography 
+//                 color="text.secondary" 
+//                 sx={{ mb: 4, lineHeight: 1.7 }}
+//               >
 //                 {opt.desc}
 //               </Typography>
 
-//               <Stack direction="row" spacing={1.5}>
+//               <Stack direction="row" spacing={2}>
 //                 <Button
 //                   variant="contained"
-//                   size="small"
+//                   size="large"
 //                   fullWidth
 //                   onClick={() => onPick(opt.value, "signIn")}
-//                   sx={
-//                     opt.value === "admin"
-//                       ? { bgcolor: "#f472b6", "&:hover": { bgcolor: "#ec4899" } }
-//                       : {}
-//                   }
+//                   sx={{
+//                     py: 1.6,
+//                     fontWeight: 600,
+//                     background: opt.value === "admin" 
+//                       ? `linear-gradient(135deg, ${BLUE} 0%, #1d4ed8 100%)`
+//                       : `linear-gradient(135deg, ${GREEN} 0%, ${GREEN_DARK} 100%)`,
+//                     boxShadow: `0 4px 16px ${alpha(opt.value === "admin" ? BLUE : GREEN, 0.35)}`,
+//                     "&:hover": {
+//                       background: opt.value === "admin" 
+//                         ? `linear-gradient(135deg, #1d4ed8, #1e40af)` 
+//                         : `linear-gradient(135deg, ${GREEN_DARK}, #065f46)`,
+//                     },
+//                   }}
 //                 >
 //                   Sign In
 //                 </Button>
+
 //                 {opt.showRegister && (
 //                   <Button
 //                     variant="outlined"
-//                     size="small"
+//                     size="large"
 //                     fullWidth
 //                     onClick={() => onPick(opt.value, "register")}
+//                     sx={{
+//                       py: 1.6,
+//                       fontWeight: 600,
+//                       borderColor: alpha(GREEN, 0.4),
+//                       color: GREEN,
+//                       "&:hover": {
+//                         borderColor: GREEN,
+//                         bgcolor: GREEN_LIGHT,
+//                       },
+//                     }}
 //                   >
 //                     Register
 //                   </Button>
@@ -148,15 +195,10 @@
 //   );
 // }
 
-
-
-// components/SignIn/RolePicker.tsx
-
 import {
   Box,
   Grid,
   Typography,
-  Card,
   Button,
   Stack,
 } from "@mui/material";
@@ -166,8 +208,8 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { motion } from "framer-motion";
 import { alpha } from "@mui/material/styles";
 import { AuthStep, Role, RoleOption } from "../types/auth.types";
+import SplitLayout from "./SplitLayout";
 
-// ── Design Tokens (Consistent with Hero) ─────────────────────────────
 const GREEN = "#059669";
 const GREEN_DARK = "#047857";
 const GREEN_LIGHT = "#d1fae5";
@@ -200,17 +242,19 @@ const ROLE_OPTIONS: RoleOption[] = [
 ];
 
 const ROLE_ICONS: Record<Role, React.ReactNode> = {
-  recruiter: <BusinessIcon sx={{ fontSize: 40 }} />,
-  job_seeker: <PersonIcon sx={{ fontSize: 40 }} />,
-  admin: <AdminPanelSettingsIcon sx={{ fontSize: 40 }} />,
+  recruiter: <BusinessIcon sx={{ fontSize: 36 }} />,
+  job_seeker: <PersonIcon sx={{ fontSize: 36 }} />,
+  admin: <AdminPanelSettingsIcon sx={{ fontSize: 36 }} />,
 };
 
-function accentColor(role: Role): string {
-  return role === "admin" ? BLUE : GREEN;   // Admin gets blue accent
+function accentColor(role: Role) {
+  return role === "admin" ? BLUE : GREEN;
 }
-
-function accentLight(role: Role): string {
+function accentLight(role: Role) {
   return role === "admin" ? BLUE_LIGHT : GREEN_LIGHT;
+}
+function accentDark(role: Role) {
+  return role === "admin" ? "#1d4ed8" : GREEN_DARK;
 }
 
 export default function RolePicker({ onPick }: Props) {
@@ -221,128 +265,121 @@ export default function RolePicker({ onPick }: Props) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
     >
-      <Box sx={{ textAlign: "center", mb: 6 }}>
-        <Typography 
-          variant="h2" 
-          sx={{ 
-            fontSize: { xs: 32, md: 48 }, 
-            mb: 1.5, 
-            fontWeight: 800, 
-            color: "#0f172a",
-            letterSpacing: "-0.03em"
-          }}
+      <SplitLayout
+        imageSrc="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=900"
+        imageAlt="Team collaborating in a modern office"
+        headline="The right talent, at the right time."
+        subline="Connecting ambitious professionals with the companies building the future."
+        accentColor={GREEN}
+        badges={[
+          { icon: "✓", label: "Verified employers" },
+          { icon: "⚡", label: "Fast matching" },
+          { icon: "🌍", label: "Remote-friendly" },
+        ]}
+      >
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em", mb: 0.5 }}
         >
           Welcome to RagasHire
         </Typography>
-        <Typography color="text.secondary" sx={{ fontSize: 17.5 }}>
+        <Typography color="text.secondary" sx={{ fontSize: 14, mb: 3 }}>
           Choose how you'd like to use the platform
         </Typography>
-      </Box>
 
-      <Grid container spacing={3}>
-        {ROLE_OPTIONS.map((opt) => (
-          <Grid
-            item
-            xs={12}
-            md={opt.value === "admin" ? 12 : 6}
-            key={opt.value}
-          >
-            <Card
+        <Stack spacing={2}>
+          {ROLE_OPTIONS.map((opt) => (
+            <Box
+              key={opt.value}
               sx={{
-                p: 4.5,
-                cursor: "pointer",
-                height: "100%",
-                transition: "all 0.3s ease",
-                border: `1px solid ${alpha(accentColor(opt.value), 0.15)}`,
+                border: `1px solid ${alpha(accentColor(opt.value), 0.18)}`,
+                borderRadius: 2.5,
+                p: 2,
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                transition: "all 0.2s ease",
                 "&:hover": {
-                  transform: "translateY(-8px)",
                   borderColor: alpha(accentColor(opt.value), 0.5),
-                  boxShadow: `0 20px 50px -15px ${alpha(accentColor(opt.value), 0.25)}`,
+                  boxShadow: `0 4px 20px ${alpha(accentColor(opt.value), 0.12)}`,
+                  transform: "translateY(-2px)",
                 },
-                ...(opt.value === "admin" && {
-                  maxWidth: { md: 420 },
-                  mx: "auto",
-                }),
               }}
             >
+              {/* Icon */}
               <Box
                 sx={{
-                  width: 78,
-                  height: 78,
-                  borderRadius: 3,
-                  mb: 3.5,
+                  width: 52,
+                  height: 52,
+                  borderRadius: 2,
                   bgcolor: accentLight(opt.value),
                   color: accentColor(opt.value),
-                  display: "grid",
-                  placeItems: "center",
-                  boxShadow: `0 4px 12px ${alpha(accentColor(opt.value), 0.15)}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
                 }}
               >
                 {ROLE_ICONS[opt.value]}
               </Box>
 
-              <Typography 
-                variant="h5" 
-                sx={{ mb: 1.5, fontWeight: 700, color: "#0f172a" }}
-              >
-                {opt.title}
-              </Typography>
+              {/* Label */}
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography fontWeight={700} fontSize={14} color="#0f172a" noWrap>
+                  {opt.title}
+                </Typography>
+                <Typography fontSize={12} color="text.secondary" lineHeight={1.5}>
+                  {opt.desc}
+                </Typography>
+              </Box>
 
-              <Typography 
-                color="text.secondary" 
-                sx={{ mb: 4, lineHeight: 1.7 }}
-              >
-                {opt.desc}
-              </Typography>
-
-              <Stack direction="row" spacing={2}>
+              {/* Actions */}
+              <Stack direction="row" spacing={1} flexShrink={0}>
                 <Button
                   variant="contained"
-                  size="large"
-                  fullWidth
+                  size="small"
                   onClick={() => onPick(opt.value, "signIn")}
                   sx={{
-                    py: 1.6,
                     fontWeight: 600,
-                    background: opt.value === "admin" 
-                      ? `linear-gradient(135deg, ${BLUE} 0%, #1d4ed8 100%)`
-                      : `linear-gradient(135deg, ${GREEN} 0%, ${GREEN_DARK} 100%)`,
-                    boxShadow: `0 4px 16px ${alpha(opt.value === "admin" ? BLUE : GREEN, 0.35)}`,
+                    fontSize: 12,
+                    px: 2,
+                    py: 0.8,
+                    background: `linear-gradient(135deg, ${accentColor(opt.value)} 0%, ${accentDark(opt.value)} 100%)`,
+                    boxShadow: `0 2px 10px ${alpha(accentColor(opt.value), 0.3)}`,
                     "&:hover": {
-                      background: opt.value === "admin" 
-                        ? `linear-gradient(135deg, #1d4ed8, #1e40af)` 
-                        : `linear-gradient(135deg, ${GREEN_DARK}, #065f46)`,
+                      background: `linear-gradient(135deg, ${accentDark(opt.value)}, ${opt.value === "admin" ? "#1e40af" : "#065f46"})`,
                     },
+                    whiteSpace: "nowrap",
+                    textTransform: "none",
                   }}
                 >
-                  Sign In
+                  Sign in
                 </Button>
-
                 {opt.showRegister && (
                   <Button
                     variant="outlined"
-                    size="large"
-                    fullWidth
+                    size="small"
                     onClick={() => onPick(opt.value, "register")}
                     sx={{
-                      py: 1.6,
                       fontWeight: 600,
-                      borderColor: alpha(GREEN, 0.4),
+                      fontSize: 12,
+                      px: 2,
+                      py: 0.8,
+                      borderColor: alpha(GREEN, 0.35),
                       color: GREEN,
-                      "&:hover": {
-                        borderColor: GREEN,
-                        bgcolor: GREEN_LIGHT,
-                      },
+                      textTransform: "none",
+                      whiteSpace: "nowrap",
+                      "&:hover": { borderColor: GREEN, bgcolor: GREEN_LIGHT },
                     }}
                   >
                     Register
                   </Button>
                 )}
               </Stack>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+            </Box>
+          ))}
+        </Stack>
+      </SplitLayout>
     </motion.div>
   );
 }

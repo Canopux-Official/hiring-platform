@@ -11,7 +11,7 @@ export default function Home() {
       <Hero />
       <Features />
       <Testimonials />
-      {/* <CTA /> */}
+      <CTA />
     </Box>
   );
 }
