@@ -1,206 +1,12 @@
 ﻿
 
-// import {
-//   Box,
-//   Grid,
-//   Typography,
-//   Card,
-//   Button,
-//   Stack,
-// } from "@mui/material";
-// import BusinessIcon from "@mui/icons-material/Business";
-// import PersonIcon from "@mui/icons-material/Person";
-// import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-// import { motion } from "framer-motion";
-// import { alpha } from "@mui/material/styles";
-// import { AuthStep, Role, RoleOption } from "../types/auth.types";
-
-// // ── Design Tokens (Consistent with Hero) ─────────────────────────────
-// const GREEN = "#059669";
-// const GREEN_DARK = "#047857";
-// const GREEN_LIGHT = "#d1fae5";
-// const BLUE = "#2563eb";
-// const BLUE_LIGHT = "#dbeafe";
-
-// interface Props {
-//   onPick: (role: Role, step: AuthStep) => void;
-// }
-
-// const ROLE_OPTIONS: RoleOption[] = [
-//   {
-//     value: "recruiter",
-//     title: "Recruiter / Hirer",
-//     desc: "Post jobs, find verified talent, manage pipelines.",
-//     showRegister: true,
-//   },
-//   {
-//     value: "job_seeker",
-//     title: "Job Seeker",
-//     desc: "Get matched, apply faster, track every conversation.",
-//     showRegister: true,
-//   },
-//   {
-//     value: "admin",
-//     title: "Administrator",
-//     desc: "Manage platform users, jobs, and all applications.",
-//     showRegister: false,
-//   },
-// ];
-
-// const ROLE_ICONS: Record<Role, React.ReactNode> = {
-//   recruiter: <BusinessIcon sx={{ fontSize: 40 }} />,
-//   job_seeker: <PersonIcon sx={{ fontSize: 40 }} />,
-//   admin: <AdminPanelSettingsIcon sx={{ fontSize: 40 }} />,
-// };
-
-// function accentColor(role: Role): string {
-//   return role === "admin" ? BLUE : GREEN;   // Admin gets blue accent
-// }
-
-// function accentLight(role: Role): string {
-//   return role === "admin" ? BLUE_LIGHT : GREEN_LIGHT;
-// }
-
-// export default function RolePicker({ onPick }: Props) {
-//   return (
-//     <motion.div
-//       key="role"
-//       initial={{ opacity: 0, y: 20 }}
-//       animate={{ opacity: 1, y: 0 }}
-//       exit={{ opacity: 0, y: -20 }}
-//     >
-//       <Box sx={{ textAlign: "center", mb: 6 }}>
-//         <Typography 
-//           variant="h2" 
-//           sx={{ 
-//             fontSize: { xs: 32, md: 48 }, 
-//             mb: 1.5, 
-//             fontWeight: 800, 
-//             color: "#0f172a",
-//             letterSpacing: "-0.03em"
-//           }}
-//         >
-//           Welcome to RagasHire
-//         </Typography>
-//         <Typography color="text.secondary" sx={{ fontSize: 17.5 }}>
-//           Choose how you'd like to use the platform
-//         </Typography>
-//       </Box>
-
-//       <Grid container spacing={3}>
-//         {ROLE_OPTIONS.map((opt) => (
-//           <Grid
-//             item
-//             xs={12}
-//             md={opt.value === "admin" ? 12 : 6}
-//             key={opt.value}
-//           >
-//             <Card
-//               sx={{
-//                 p: 4.5,
-//                 cursor: "pointer",
-//                 height: "100%",
-//                 transition: "all 0.3s ease",
-//                 border: `1px solid ${alpha(accentColor(opt.value), 0.15)}`,
-//                 "&:hover": {
-//                   transform: "translateY(-8px)",
-//                   borderColor: alpha(accentColor(opt.value), 0.5),
-//                   boxShadow: `0 20px 50px -15px ${alpha(accentColor(opt.value), 0.25)}`,
-//                 },
-//                 ...(opt.value === "admin" && {
-//                   maxWidth: { md: 420 },
-//                   mx: "auto",
-//                 }),
-//               }}
-//             >
-//               <Box
-//                 sx={{
-//                   width: 78,
-//                   height: 78,
-//                   borderRadius: 3,
-//                   mb: 3.5,
-//                   bgcolor: accentLight(opt.value),
-//                   color: accentColor(opt.value),
-//                   display: "grid",
-//                   placeItems: "center",
-//                   boxShadow: `0 4px 12px ${alpha(accentColor(opt.value), 0.15)}`,
-//                 }}
-//               >
-//                 {ROLE_ICONS[opt.value]}
-//               </Box>
-
-//               <Typography 
-//                 variant="h5" 
-//                 sx={{ mb: 1.5, fontWeight: 700, color: "#0f172a" }}
-//               >
-//                 {opt.title}
-//               </Typography>
-
-//               <Typography 
-//                 color="text.secondary" 
-//                 sx={{ mb: 4, lineHeight: 1.7 }}
-//               >
-//                 {opt.desc}
-//               </Typography>
-
-//               <Stack direction="row" spacing={2}>
-//                 <Button
-//                   variant="contained"
-//                   size="large"
-//                   fullWidth
-//                   onClick={() => onPick(opt.value, "signIn")}
-//                   sx={{
-//                     py: 1.6,
-//                     fontWeight: 600,
-//                     background: opt.value === "admin" 
-//                       ? `linear-gradient(135deg, ${BLUE} 0%, #1d4ed8 100%)`
-//                       : `linear-gradient(135deg, ${GREEN} 0%, ${GREEN_DARK} 100%)`,
-//                     boxShadow: `0 4px 16px ${alpha(opt.value === "admin" ? BLUE : GREEN, 0.35)}`,
-//                     "&:hover": {
-//                       background: opt.value === "admin" 
-//                         ? `linear-gradient(135deg, #1d4ed8, #1e40af)` 
-//                         : `linear-gradient(135deg, ${GREEN_DARK}, #065f46)`,
-//                     },
-//                   }}
-//                 >
-//                   Sign In
-//                 </Button>
-
-//                 {opt.showRegister && (
-//                   <Button
-//                     variant="outlined"
-//                     size="large"
-//                     fullWidth
-//                     onClick={() => onPick(opt.value, "register")}
-//                     sx={{
-//                       py: 1.6,
-//                       fontWeight: 600,
-//                       borderColor: alpha(GREEN, 0.4),
-//                       color: GREEN,
-//                       "&:hover": {
-//                         borderColor: GREEN,
-//                         bgcolor: GREEN_LIGHT,
-//                       },
-//                     }}
-//                   >
-//                     Register
-//                   </Button>
-//                 )}
-//               </Stack>
-//             </Card>
-//           </Grid>
-//         ))}
-//       </Grid>
-//     </motion.div>
-//   );
-// }
-
 import {
   Box,
-  Grid,
   Typography,
   Button,
   Stack,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
 import PersonIcon from "@mui/icons-material/Person";
@@ -258,6 +64,9 @@ function accentDark(role: Role) {
 }
 
 export default function RolePicker({ onPick }: Props) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <motion.div
       key="role"
@@ -279,11 +88,21 @@ export default function RolePicker({ onPick }: Props) {
       >
         <Typography
           variant="h5"
-          sx={{ fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em", mb: 0.5 }}
+          sx={{
+            fontWeight: 800,
+            color: "#0f172a",
+            letterSpacing: "-0.02em",
+            mb: 0.5,
+            // ✅ Slightly smaller heading on mobile
+            fontSize: { xs: "1.2rem", sm: "1.5rem" },
+          }}
         >
           Welcome to RagasHire
         </Typography>
-        <Typography color="text.secondary" sx={{ fontSize: 14, mb: 3 }}>
+        <Typography
+          color="text.secondary"
+          sx={{ fontSize: { xs: 13, sm: 14 }, mb: 3 }}
+        >
           Choose how you'd like to use the platform
         </Typography>
 
@@ -294,10 +113,12 @@ export default function RolePicker({ onPick }: Props) {
               sx={{
                 border: `1px solid ${alpha(accentColor(opt.value), 0.18)}`,
                 borderRadius: 2.5,
-                p: 2,
+                p: { xs: 1.5, sm: 2 },
                 display: "flex",
-                alignItems: "center",
-                gap: 2,
+                // ✅ Stack vertically on mobile, row on sm+
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "flex-start", sm: "center" },
+                gap: { xs: 1.5, sm: 2 },
                 transition: "all 0.2s ease",
                 "&:hover": {
                   borderColor: alpha(accentColor(opt.value), 0.5),
@@ -306,43 +127,70 @@ export default function RolePicker({ onPick }: Props) {
                 },
               }}
             >
-              {/* Icon */}
+              {/* Top row on mobile: icon + label side by side */}
               <Box
                 sx={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: 2,
-                  bgcolor: accentLight(opt.value),
-                  color: accentColor(opt.value),
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  gap: 1.5,
+                  width: { xs: "100%", sm: "auto" },
+                }}
+              >
+                {/* Icon */}
+                <Box
+                  sx={{
+                    width: { xs: 44, sm: 52 },
+                    height: { xs: 44, sm: 52 },
+                    borderRadius: 2,
+                    bgcolor: accentLight(opt.value),
+                    color: accentColor(opt.value),
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  {ROLE_ICONS[opt.value]}
+                </Box>
+
+                {/* Label */}
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography
+                    fontWeight={700}
+                    fontSize={{ xs: 13, sm: 14 }}
+                    color="#0f172a"
+                  >
+                    {opt.title}
+                  </Typography>
+                  <Typography
+                    fontSize={{ xs: 11, sm: 12 }}
+                    color="text.secondary"
+                    lineHeight={1.5}
+                  >
+                    {opt.desc}
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Buttons — full width row on mobile */}
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  // ✅ Full width on mobile so buttons fill the card
+                  width: { xs: "100%", sm: "auto" },
                   flexShrink: 0,
                 }}
               >
-                {ROLE_ICONS[opt.value]}
-              </Box>
-
-              {/* Label */}
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography fontWeight={700} fontSize={14} color="#0f172a" noWrap>
-                  {opt.title}
-                </Typography>
-                <Typography fontSize={12} color="text.secondary" lineHeight={1.5}>
-                  {opt.desc}
-                </Typography>
-              </Box>
-
-              {/* Actions */}
-              <Stack direction="row" spacing={1} flexShrink={0}>
                 <Button
                   variant="contained"
                   size="small"
+                  fullWidth={isMobile}
                   onClick={() => onPick(opt.value, "signIn")}
                   sx={{
                     fontWeight: 600,
-                    fontSize: 12,
-                    px: 2,
+                    fontSize: { xs: 13, sm: 12 },
+                    px: { xs: 1.5, sm: 2 },
                     py: 0.8,
                     background: `linear-gradient(135deg, ${accentColor(opt.value)} 0%, ${accentDark(opt.value)} 100%)`,
                     boxShadow: `0 2px 10px ${alpha(accentColor(opt.value), 0.3)}`,
@@ -355,15 +203,17 @@ export default function RolePicker({ onPick }: Props) {
                 >
                   Sign in
                 </Button>
+
                 {opt.showRegister && (
                   <Button
                     variant="outlined"
                     size="small"
+                    fullWidth={isMobile}
                     onClick={() => onPick(opt.value, "register")}
                     sx={{
                       fontWeight: 600,
-                      fontSize: 12,
-                      px: 2,
+                      fontSize: { xs: 13, sm: 12 },
+                      px: { xs: 1.5, sm: 2 },
                       py: 0.8,
                       borderColor: alpha(GREEN, 0.35),
                       color: GREEN,

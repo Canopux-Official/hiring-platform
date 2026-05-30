@@ -194,7 +194,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { AnimatePresence } from "framer-motion";
 import { alpha } from "@mui/material/styles";
 
@@ -217,6 +217,8 @@ export default function SignIn() {
 
   const { signIn, register, user, loading } = useAuth();
   const nav = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     if (!loading && user) nav(roleHome(user.role), { replace: true });
@@ -322,8 +324,10 @@ export default function SignIn() {
         minHeight: "calc(100vh - 100px)",
         display: "grid",
         placeItems: "center",
-        px: { xs: 2, md: 4 },
-        py: 6,
+        // ✅ Tighter horizontal padding on mobile
+        px: { xs: 1.5, sm: 2, md: 4 },
+        // ✅ Less vertical padding on mobile
+        py: { xs: 3, sm: 4, md: 6 },
         background: `
           radial-gradient(circle at 30% 20%, ${alpha(GREEN, 0.08)}, transparent 60%),
           radial-gradient(circle at 70% 75%, ${alpha(BLUE, 0.07)}, transparent 60%)
@@ -345,13 +349,17 @@ export default function SignIn() {
         }}
       />
 
-      {/* Max-width container for the split card */}
+      {/* ✅ Responsive max-width: full width on mobile, capped on larger screens */}
       <Box
         sx={{
           position: "relative",
           zIndex: 1,
           width: "100%",
-          maxWidth: 900,
+          maxWidth: { xs: "100%", sm: 480, md: 900 },
+          // ✅ Ensure children (cards) stretch to fill on mobile
+          "& > *": {
+            width: "100%",
+          },
         }}
       >
         <AnimatePresence mode="wait">
