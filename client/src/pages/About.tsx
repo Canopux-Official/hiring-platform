@@ -20,7 +20,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 
 const founderData = {
-  name: "Ragas S",
+  name: "Demo Founder",
   title: "Founder",
   subtitle: "Global Talent Acquisition Leader · International Recruitment Specialist · Campus & Corporate Hiring Expert",
   initials: "RS",
@@ -73,11 +73,11 @@ const founderData = {
     "Dedicated Support for Employers & Candidates",
   ],
   contact: {
-    email: "ragasworld1@gmail.com",
-    phone: "+91 6299209560",
+    email: "demo@gmail.com",
+    phone: "+91 xxxxxxxxxx",
   },
   socials: [
-    { platform: "linkedin", url: "https://www.linkedin.com/in/rohan-singh-5919a83b5" },
+    { platform: "linkedin", url: "https://www.linkedin.com" },
   ],
 };
 
