@@ -14,6 +14,7 @@ import SeekerDashboard from "./pages/seeker/SeekerDashboard";
 import Jobs from "./pages/jobs/Jobs";
 import AboutPage from "./pages/About";
 import PricingPage from "./pages/Pricing";
+import CanopuxBanner from "./components/CanopuxFooter";
 
 // ─── Role-based redirect helper ────────────────────────────────────────────────
 
@@ -85,6 +86,7 @@ export default function App() {
           </Routes>
         </Box>
         <SiteFooter />
+        <CanopuxBanner /> 
       </Box>
     </Box>
   );

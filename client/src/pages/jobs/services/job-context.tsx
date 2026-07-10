@@ -10,7 +10,7 @@ import { LocalJob, EmploymentType, WorkMode, Urgency } from "../types";
 
 // ─── Storage Key ──────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = "RagasHire.jobs.v1";
+const STORAGE_KEY = "PerfectHire.jobs.v1";
 
 // ─── Seed Data ────────────────────────────────────────────────────────────────
 

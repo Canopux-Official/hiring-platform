@@ -160,7 +160,7 @@ export default function SplitLayout({
             💼
           </Box>
           <Box sx={{ fontSize: 16, fontWeight: 700, color: "text.primary", letterSpacing: "-0.01em" }}>
-            RagasHire
+            PerfectHire
           </Box>
         </Box>
 

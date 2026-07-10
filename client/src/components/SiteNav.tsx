@@ -93,7 +93,7 @@ export default function SiteNav() {
           >
             <img
               src={logo}
-              alt="RagasHire"
+              alt="PerfectHire"
               style={{
                 width: "100%",
                 height: "100%",
@@ -109,7 +109,7 @@ export default function SiteNav() {
             color: "#ffffff",
             letterSpacing: "-0.025em"
           }}>
-            RagasHire
+            PerfectHire
           </Typography>
         </Box>
 
@@ -358,7 +358,7 @@ export default function SiteNav() {
           >
             <img
               src={logo}
-              alt="RagasHire"
+              alt="PerfectHire"
               style={{
                 width: "100%",
                 height: "100%",
@@ -367,7 +367,7 @@ export default function SiteNav() {
             />
           </Box>
           <Typography sx={{ fontWeight: 800, fontSize: 17, color: "#ffffff" }}>
-            RagasHire
+            PerfectHire
           </Typography>
         </Box>
 

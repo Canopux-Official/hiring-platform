@@ -97,7 +97,7 @@ export default function RolePicker({ onPick }: Props) {
             fontSize: { xs: "1.2rem", sm: "1.5rem" },
           }}
         >
-          Welcome to RagasHire
+          Welcome to PerfectHire
         </Typography>
         <Typography
           color="text.secondary"

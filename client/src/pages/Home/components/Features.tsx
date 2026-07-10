@@ -90,7 +90,7 @@
 //               </Box>
 //             </Typography>
 //             <Typography sx={{ color: "#64748b", maxWidth: 540, mx: "auto", fontSize: 17, lineHeight: 1.7 }}>
-//               RagasHire brings every kind of work — from boardroom to warehouse floor — into one
+//               PerfectHire brings every kind of work — from boardroom to warehouse floor — into one
 //               cohesive, intelligent hiring experience.
 //             </Typography>
 //           </motion.div>
@@ -245,7 +245,7 @@ export function Features() {
               </Box>
             </Typography>
             <Typography sx={{ color: "#64748b", maxWidth: 540, mx: "auto", fontSize: 17, lineHeight: 1.7 }}>
-              RagasHire brings every kind of work — from boardroom to warehouse floor — into one
+              PerfectHire brings every kind of work — from boardroom to warehouse floor — into one
               cohesive, intelligent hiring experience.
             </Typography>
           </motion.div>
@@ -403,7 +403,7 @@ export function Features() {
                 lineHeight: 1.65,
               }}>
                 Whether you're scaling a startup or staffing a global enterprise,
-                RagasHire adapts to your pace.
+                PerfectHire adapts to your pace.
               </Typography>
             </Box>
           </Box>
