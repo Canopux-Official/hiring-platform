@@ -3,7 +3,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { alpha } from "@mui/material/styles";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
-import logo from '../assets/logo.png';
+import logo from '../assets/logo.jpeg';
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 
 // Design Tokens

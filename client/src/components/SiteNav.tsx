@@ -14,7 +14,7 @@ import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import { useAuth } from "../pages/signin/lib/auth";
 import { alpha } from "@mui/material/styles";
-import logo from '../assets/logo.png'
+import logo from '../assets/logo.jpeg'
 import SellOutlinedIcon from "@mui/icons-material/SellOutlined";
 
 // ── Design Tokens (Same as Hero) ─────────────────────────────────────
