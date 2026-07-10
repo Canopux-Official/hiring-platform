@@ -238,7 +238,7 @@
 
 import { useEffect, useRef } from "react";
 import saturnImg from "../assets/saturn.png";
-import logoImg from "../assets/logo.jpeg";
+import logoImg from "../assets/logo.png";
 
 // Real asteroid belt image from NASA (public domain)
 const ASTEROID_BG =
