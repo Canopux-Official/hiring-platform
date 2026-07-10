@@ -15,7 +15,7 @@ const testimonials = [
   {
     name: "Lena Park",
     role: "Head of Talent, FlowState AI",
-    quote: "We filled three staff engineering seats in 11 days. PerfectHire's match scores were genuinely accurate — better than any ATS we've used.",
+    quote: "We filled three staff engineering seats in 11 days. Rozgaari's match scores were genuinely accurate — better than any ATS we've used.",
     avatar: "LP", color: GREEN, bg: GREEN_LIGHT, stars: 5,
   },
   {

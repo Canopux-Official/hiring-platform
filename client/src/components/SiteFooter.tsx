@@ -37,7 +37,7 @@ export default function SiteFooter() {
               >
                 <img
                   src={logo}
-                  alt="PerfectHire"
+                  alt="Rozgaari"
                   style={{
                     width: "100%",
                     height: "100%",
@@ -54,7 +54,7 @@ export default function SiteFooter() {
                   color: "#ffffff"
                 }}
               >
-                PerfectHire
+                Rozgaari
               </Typography>
             </Stack>
 
@@ -169,7 +169,7 @@ export default function SiteFooter() {
           gap: 3
         }}>
           <Typography sx={{ color: alpha("#94a3b8", 0.6), fontSize: 13.5 }}>
-            © {new Date().getFullYear()} PerfectHire. All rights reserved.
+            © {new Date().getFullYear()} Rozgaari. All rights reserved.
           </Typography>
 
           <Stack direction="row" spacing={4}>

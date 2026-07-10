@@ -25,7 +25,7 @@ interface AuthCtx {
 }
 
 // ─── Storage key ──────────────────────────────────────────────────────────────
-const STORAGE = "PerfectHire.auth.v1";
+const STORAGE = "Rozgaari.auth.v1";
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
@@ -117,6 +117,6 @@ export function useAuth() {
 //   { email: string; password: string }
 // > = {
 //   admin: { email: "admin@platform.com", password: "Admin@1234" },
-//   recruiter: { email: "recruiter@PerfectHire.com", password: "Recruit@123" },
-//   job_seeker: { email: "jobseeker@PerfectHire.com", password: "seeker@123" },
+//   recruiter: { email: "recruiter@Rozgaari.com", password: "Recruit@123" },
+//   job_seeker: { email: "jobseeker@Rozgaari.com", password: "seeker@123" },
 // };

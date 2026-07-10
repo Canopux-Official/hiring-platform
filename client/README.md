@@ -1,6 +1,6 @@
-# PerfectHire — React + TypeScript + Material UI
+# Rozgaari — React + TypeScript + Material UI
 
-The AI-powered global hiring platform — a faithful MUI port of the original PerfectHire Lovable build.
+The AI-powered global hiring platform — a faithful MUI port of the original Rozgaari Lovable build.
 
 ## Stack
 
@@ -34,8 +34,8 @@ The auth is mocked in `src/lib/auth.tsx` and persisted via `localStorage`.
 
 | Role        | Email                          | Password    |
 |-------------|--------------------------------|-------------|
-| Recruiter   | `recruiter@PerfectHire.com`     | `Recruit123`|
-| Job Seeker  | `jobseeker@PerfectHire.com`     | `Job123`    |
+| Recruiter   | `recruiter@Rozgaari.com`     | `Recruit123`|
+| Job Seeker  | `jobseeker@Rozgaari.com`     | `Job123`    |
 
 Use the **Autofill** button on the sign-in screen.
 
